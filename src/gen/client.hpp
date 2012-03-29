@@ -1,1 +1,1 @@
-#include "KyotoTyrantService_client.hpp"
+#include "KyotoTycoonService_client.hpp"

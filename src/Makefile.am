@@ -5,12 +5,12 @@ plugin_LTLIBRARIES = libktmsgpack.la
 
 libktmsgpack_la_SOURCES = \
 	kt-msgpack.cc \
-	gen/KyotoTyrantService.cpp
+	gen/KyotoTycoonService.cpp
 
 noinst_HEADERS = \
-	gen/KyotoTyrantService.hpp \
-	gen/KyotoTyrantService_client.hpp \
-	gen/KyotoTyrantService_server.hpp \
+	gen/KyotoTycoonService.hpp \
+	gen/KyotoTycoonService_client.hpp \
+	gen/KyotoTycoonService_server.hpp \
 	gen/client.hpp \
 	gen/server.hpp \
 	gen/types.hpp

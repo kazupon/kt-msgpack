@@ -13,7 +13,8 @@ namespace kt = kyototycoon;
 
 namespace rpc = msgpack::rpc;
 
-class MessagePackServer : public kt::PluggableServer, public KyotoTyrantService::server {
+//class MessagePackServer : public kt::PluggableServer, public KyotoTyrantService::server {
+class MessagePackServer : public kt::PluggableServer, public KyotoTycoonService::server {
 public:
 	MessagePackServer() { }
 	~MessagePackServer() { }
@@ -130,6 +131,11 @@ private:
 	struct timeval m_start_time;
 
 private:
+  void ping(msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
+    req.result(true);
+  }
+
+  /*
 	void count(msgpack::rpc::request::type<uint64_t> req, KyotoTyrantService::count& params) {
 		req.result(get_db()->count());
 	}
@@ -224,6 +230,7 @@ private:
 		double sec = t.tv_sec + (double)t.tv_usec*1e-6;
 		req.result(sec);
 	}
+  */
 
 
 private:
