@@ -43,10 +43,13 @@ public:
 		m_dbnum = dbnum;
 
 		m_logger = logger;
+		log(m_logger, Logger::SYSTEM, LOG_PREFIX "dbnum: %d", m_dbnum);
 		log(m_logger, Logger::SYSTEM, LOG_PREFIX "configured: expr=%s", expr);
 		log(m_logger, Logger::DEBUG, LOG_PREFIX "  host=%s", m_cfg.host.c_str());
 		log(m_logger, Logger::DEBUG, LOG_PREFIX "  port=%d", m_cfg.port);
 		log(m_logger, Logger::DEBUG, LOG_PREFIX "  thread=%d", m_cfg.thread);
+		log(m_logger, Logger::DEBUG, LOG_PREFIX "  mhost=%s", m_cfg.master_host.c_str());
+		log(m_logger, Logger::DEBUG, LOG_PREFIX "  mport=%d", m_cfg.master_port);
 	}
 
 	bool start()
@@ -81,7 +84,9 @@ private:
 		Config() :
 			host("0.0.0.0"),
 			port(0),
-			thread(8)
+			thread(8),
+      master_host("127.0.0.1"),
+      master_port(kt::DEFPORT)
 		{ }
 
 	private:
@@ -94,6 +99,10 @@ private:
 				port = kc::atoi(value.c_str());
 			} else if(key == "thread") {
 				thread = kc::atoi(value.c_str());
+      } else if (key == "mhost") {
+        master_host = value;
+      } else if (key == "mport") {
+				master_host = kc::atoi(value.c_str());
 			} else {
 				log(logger, Logger::SYSTEM,
 						LOG_PREFIX "unknown option: %s", key.c_str());
@@ -119,6 +128,8 @@ private:
 		std::string host;
 		uint16_t port;
 		uint16_t thread;
+    std::string master_host;
+    uint16_t master_port;
 	private:
 		Logger* m_logger;
 	};
@@ -145,6 +156,37 @@ private:
       refoutmap.insert(std::make_pair(key, value));
     }
     req.result(refoutmap);
+  }
+
+  void report(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::report& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " report");
+    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refreport;
+    double tout = 0;
+    kt::RemoteDB db;
+    if (!db.open(m_cfg.master_host.c_str(), m_cfg.master_port, tout)) {
+      req.error(1); // TODO: error 
+      return;
+    }
+    bool err = false;
+    std::map<std::string, std::string> status;
+    if (db.report(&status)) {
+      std::map<std::string, std::string>::iterator it = status.begin();
+      std::map<std::string, std::string>::iterator itend = status.end();
+      while (it != itend) {
+        msgpack::type::raw_ref key(it->first.c_str(), it->first.size());
+        msgpack::type::raw_ref value(it->second.c_str(), it->second.size());
+        refreport.insert(std::make_pair(key, value));
+        ++it;
+      }
+    } else {
+      req.error(2); // TODO: error
+      err = true;
+    }
+    if (!db.close()) {
+      req.error(3); // TODO: error
+      err = true;
+    }
+    req.result(refreport);
   }
 
   /*
@@ -249,6 +291,20 @@ private:
 	kt::TimedDB* get_db() {
 		return &m_dbary[0];
 	}
+
+  void set_message(
+      std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, 
+      std::string& key,
+      const char* format, ...) {
+    std::string msg;
+    msgpack::type::raw_ref refkey(key.c_str(), key.size());
+    va_list ap;
+    va_start(ap, format);
+    kc::vstrprintf(&msg, format, ap);
+    va_end(ap);
+    msgpack::type::raw_ref refmsg(msg.c_str(), msg.size());
+    map.insert(std::make_pair(refkey, refmsg));
+  }
 
 	void throw_error(const std::string& msg) {
 		throw_error(msg, get_db()->error());
