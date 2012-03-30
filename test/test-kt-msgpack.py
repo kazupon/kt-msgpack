@@ -57,5 +57,14 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     for key in reports:
       self.assertTrue(ret.has_key(key))
 
+  def test_status(self):
+    ret = self._client.call('status')
+    reports = [
+      'count',
+      'size'
+    ]
+    for key in reports:
+      self.assertTrue(ret.has_key(key))
+  
 if __name__ == '__main__':
   unittest.main()
