@@ -57,6 +57,19 @@ none
 #### return value
 arbitrary records.
 
+### status
+Get the miscellaneous status information of a database.
+
+#### parameters
+- DB: the database identifier. (optional)
+
+#### return value
+Returns the type of map data that contains information status.
+Contains the following data.
+
+- count: the number of records.
+- size: the size of the database file.
+- (optional): arbitrary records for other information.
 
 ## License
 
