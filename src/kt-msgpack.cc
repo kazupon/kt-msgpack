@@ -16,138 +16,144 @@ namespace rpc = msgpack::rpc;
 //class MessagePackServer : public kt::PluggableServer, public KyotoTyrantService::server {
 class MessagePackServer : public kt::PluggableServer, public KyotoTycoonService::server {
 public:
-	MessagePackServer() { }
-	~MessagePackServer() { }
+  MessagePackServer() { }
+  ~MessagePackServer() { }
 
 private:
-	typedef kt::ThreadedServer::Logger Logger;
+  typedef kt::ThreadedServer::Logger Logger;
 
 private:
-	static void log(Logger* logger, Logger::Kind kind, const char* format, ...) {
-		char buf[1024];
-		va_list ap;
-		va_start(ap, format);
-		int len = vsnprintf(buf, sizeof(buf)-1, format, ap);
-		va_end(ap);
-		buf[len] = '\0';
-		logger->log(kind, buf);
-	}
+  static void log(Logger* logger, Logger::Kind kind, const char* format, ...) {
+    char buf[1024];
+    va_list ap;
+    va_start(ap, format);
+    int len = vsnprintf(buf, sizeof(buf)-1, format, ap);
+    va_end(ap);
+    buf[len] = '\0';
+    logger->log(kind, buf);
+  }
 
 public:
-	void configure(kt::TimedDB* dbary, size_t dbnum,
-			Logger* logger, uint32_t logkinds,
-			const char* expr)
-	{
-		m_cfg.parse(logger, expr);
-		m_dbary = dbary;
-		m_dbnum = dbnum;
+  void configure(kt::TimedDB* dbary, size_t dbnum,
+      Logger* logger, uint32_t logkinds,
+      const char* expr) {
+    m_cfg.parse(logger, expr);
+    m_dbary = dbary;
+    m_dbnum = dbnum;
 
-		m_logger = logger;
-		log(m_logger, Logger::SYSTEM, LOG_PREFIX "dbnum: %d", m_dbnum);
-		log(m_logger, Logger::SYSTEM, LOG_PREFIX "configured: expr=%s", expr);
-		log(m_logger, Logger::DEBUG, LOG_PREFIX "  host=%s", m_cfg.host.c_str());
-		log(m_logger, Logger::DEBUG, LOG_PREFIX "  port=%d", m_cfg.port);
-		log(m_logger, Logger::DEBUG, LOG_PREFIX "  thread=%d", m_cfg.thread);
-		log(m_logger, Logger::DEBUG, LOG_PREFIX "  mhost=%s", m_cfg.master_host.c_str());
-		log(m_logger, Logger::DEBUG, LOG_PREFIX "  mport=%d", m_cfg.master_port);
-	}
+    m_logger = logger;
+    log(m_logger, Logger::SYSTEM, LOG_PREFIX " dbnum: %d", m_dbnum);
+    log(m_logger, Logger::SYSTEM, LOG_PREFIX " configured expr:%s", expr);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX "  host=%s", m_cfg.host.c_str());
+    log(m_logger, Logger::DEBUG, LOG_PREFIX "  port=%d", m_cfg.port);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX "  thread=%d", m_cfg.thread);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX "  mhost=%s", m_cfg.master_host.c_str());
+    log(m_logger, Logger::DEBUG, LOG_PREFIX "  mport=%d", m_cfg.master_port);
 
-	bool start()
-	try {
-		gettimeofday(&m_start_time, NULL);
+    for (int32_t i = 0; i < m_dbnum; i++) {
+      std::string path = m_dbary[i].path();
+      const char* rp = path.c_str();
+      const char* pv = std::strrchr(rp, kc::File::PATHCHR);
+      if (pv) {
+        rp = pv + 1;
+      }
+      m_dbmap[std::string(rp)] = i;
+    }
+  }
 
-		instance.listen(m_cfg.host, m_cfg.port);
+  bool start() {
+    try {
+      gettimeofday(&m_start_time, NULL);
+      instance.listen(m_cfg.host, m_cfg.port);
+      instance.get_loop()->start(m_cfg.thread);
+      return true;
+    } catch (std::exception& e) {
+      log(m_logger, Logger::ERROR, LOG_PREFIX "listen failed: %s", e.what());
+      return false;
+    }
+  }
 
-		instance.get_loop()->start(m_cfg.thread);
+  bool stop() {
+    instance.get_loop()->end();
+    instance.close();
+    return true;
+  }
 
-		return true;
-
-	} catch (std::exception& e) {
-		log(m_logger, Logger::ERROR, LOG_PREFIX "listen failed: %s", e.what());
-		return false;
-	}
-
-	bool stop() {
-		instance.get_loop()->end();
-		instance.close();
-		return true;
-	}
-
-	bool finish() {
-		instance.get_loop()->join();
-		return true;
-	}
+  bool finish() {
+    instance.get_loop()->join();
+    return true;
+  }
 
 private:
-	class Config {
-	public:
-		Config() :
-			host("0.0.0.0"),
-			port(0),
-			thread(8),
+  class Config {
+  public:
+    Config() :
+      host("0.0.0.0"),
+      port(0),
+      thread(8),
       master_host("127.0.0.1"),
-      master_port(kt::DEFPORT)
-		{ }
+      master_port(kt::DEFPORT) {
+    }
 
-	private:
-		void option(Logger* logger,
-				const std::string& key, const std::string& value)
-		{
-			if(key == "host") {
-				host = value;
-			} else if(key == "port") {
-				port = kc::atoi(value.c_str());
-			} else if(key == "thread") {
-				thread = kc::atoi(value.c_str());
+  private:
+    void option(Logger* logger,
+        const std::string& key, const std::string& value) {
+      if(key == "host") {
+        host = value;
+      } else if(key == "port") {
+        port = kc::atoi(value.c_str());
+      } else if(key == "thread") {
+        thread = kc::atoi(value.c_str());
       } else if (key == "mhost") {
         master_host = value;
       } else if (key == "mport") {
-				master_host = kc::atoi(value.c_str());
-			} else {
-				log(logger, Logger::SYSTEM,
-						LOG_PREFIX "unknown option: %s", key.c_str());
-			}
-		}
+        master_host = kc::atoi(value.c_str());
+      } else {
+        log(logger, Logger::SYSTEM,
+            LOG_PREFIX "unknown option: %s", key.c_str());
+      }
+    }
 
-	public:
-		void parse(Logger* logger, const char* expr) {
-			std::vector<std::string> elems;
-			kc::strsplit(expr, '#', &elems);
-			for(std::vector<std::string>::const_iterator it(elems.begin()),
-					it_end(elems.end()); it != it_end; ++it) {
-				size_t poseq = it->find('=');
-				if(poseq != std::string::npos) {
-					option(logger, it->substr(0,poseq), it->substr(poseq+1));
-				} else {
-					option(logger, *it, "");
-				}
-			}
-		}
+  public:
+    void parse(Logger* logger, const char* expr) {
+      std::vector<std::string> elems;
+      kc::strsplit(expr, '#', &elems);
+      for(std::vector<std::string>::const_iterator it(elems.begin()),
+          it_end(elems.end()); it != it_end; ++it) {
+        size_t poseq = it->find('=');
+        if(poseq != std::string::npos) {
+          option(logger, it->substr(0,poseq), it->substr(poseq+1));
+        } else {
+          option(logger, *it, "");
+        }
+      }
+    }
 
-	public:
-		std::string host;
-		uint16_t port;
-		uint16_t thread;
+  public:
+    std::string host;
+    uint16_t port;
+    uint16_t thread;
     std::string master_host;
     uint16_t master_port;
-	private:
-		Logger* m_logger;
+  private:
+    Logger* m_logger;
 	};
 
-	Config m_cfg;
-	Logger* m_logger;
-	kt::TimedDB* m_dbary;
-	size_t m_dbnum;
+  Config m_cfg;
+  Logger* m_logger;
+  kt::TimedDB* m_dbary;
+  size_t m_dbnum;
+  std::map<std::string, int32_t> m_dbmap;
 
-	struct timeval m_start_time;
+  struct timeval m_start_time;
 
 private:
-  void ping (msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
+  void ping(msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " ping");
     req.result(true);
   }
 
-  void echo (msgpack::rpc::request::type<std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params) {
+  void echo(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " echo");
     std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
     for (std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
@@ -189,6 +195,40 @@ private:
     req.result(refreport);
   }
 
+  void status(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::status& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " status");
+    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refstatus;
+
+    kt::TimedDB* db = NULL;
+    if (params.DB.ptr != NULL) {
+      std::string name(params.DB.ptr, params.DB.size);
+      db = get_db(name);
+    } else {
+      db = get_db();
+    }
+
+    if (db == NULL) {
+      // TODO: error
+      req.error(1);
+      return;
+    }
+
+    std::map<std::string, std::string> status;
+    if (db->status(&status)) {
+      for (std::map<std::string, std::string>::const_iterator it(status.begin()), it_end(status.end()); it != it_end; ++it) {
+        msgpack::type::raw_ref key(it->first.c_str(), it->first.size());
+        msgpack::type::raw_ref value(it->second.c_str(), it->second.size());
+        refstatus.insert(std::make_pair(key, value));
+      }
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      // TODO: error
+      req.error(1);
+      return;
+    }
+
+    req.result(refstatus);
+  }
   /*
 	void count(msgpack::rpc::request::type<uint64_t> req, KyotoTyrantService::count& params) {
 		req.result(get_db()->count());
@@ -288,9 +328,18 @@ private:
 
 
 private:
-	kt::TimedDB* get_db() {
-		return &m_dbary[0];
-	}
+  kt::TimedDB* get_db() {
+    return &m_dbary[0];
+  }
+
+  kt::TimedDB* get_db(const std::string& name) {
+    int32_t index = 0;
+    std::map<std::string, int32_t>::const_iterator it = m_dbmap.find(name);
+    if (it != m_dbmap.end()) {
+      index = it->second;
+    }
+    return &m_dbary[index];
+  }
 
   void set_message(
       std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, 
@@ -306,29 +355,29 @@ private:
     map.insert(std::make_pair(refkey, refmsg));
   }
 
-	void throw_error(const std::string& msg) {
-		throw_error(msg, get_db()->error());
-	}
+  void throw_error(const std::string& msg) {
+    throw_error(msg, get_db()->error());
+  }
 
-	void throw_error(const std::string& msg, const kc::BasicDB::Error& err) {
-		std::ostringstream s;
-		s << msg;
-		s << ": " << err.message();
-		s << " (" << kc::BasicDB::Error::codename(err.code()) << ")";
-		throw std::runtime_error(s.str());
-	}
+  void throw_error(const std::string& msg, const kc::BasicDB::Error& err) {
+    std::ostringstream s;
+    s << msg;
+    s << ": " << err.message();
+    s << " (" << kc::BasicDB::Error::codename(err.code()) << ")";
+    throw std::runtime_error(s.str());
+  }
 
-	void string_vec_to_raw_ref_vec_nocopy(
-			const std::vector<std::string>* src,
-			std::vector<msgpack::type::raw_ref>* dst) {
-		for(std::vector<std::string>::const_iterator it(src->begin()),
-				it_end(src->end()); it != it_end; ++it) {
-			dst->push_back(msgpack::type::raw_ref(it->data(), it->size()));
-		}
-	}
+  void string_vec_to_raw_ref_vec_nocopy(
+      const std::vector<std::string>* src,
+      std::vector<msgpack::type::raw_ref>* dst) {
+    for(std::vector<std::string>::const_iterator it(src->begin()),
+        it_end(src->end()); it != it_end; ++it) {
+      dst->push_back(msgpack::type::raw_ref(it->data(), it->size()));
+    }
+  }
 
 private:
-	MessagePackServer(const MessagePackServer&);
+  MessagePackServer(const MessagePackServer&);
 };
 
 }  // noname namespace
@@ -336,6 +385,6 @@ private:
 
 extern "C"
 void* ktservinit(void) {
-	return new MessagePackServer();
+  return new MessagePackServer();
 }
 

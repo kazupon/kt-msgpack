@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_0e54fd99_HPP__
-#define MPRPC_KyotoTycoonService_client_0e54fd99_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_fcd5ed0c_HPP__
+#define MPRPC_KyotoTycoonService_client_fcd5ed0c_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -81,6 +81,29 @@ public:
 			) {
 		KyotoTycoonService::report _Message;
 		return report_async_apply(_Message);
+	}
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  status_apply(
+			const KyotoTycoonService::status& message) {
+		return instance.call_apply("status", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+	}
+
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  status(
+			const msgpack::type::raw_ref& DB) {
+		KyotoTycoonService::status _Message;
+		_Message.DB = DB;
+		return status_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > status_async_apply(
+			const KyotoTycoonService::status& message) {
+		return instance.call_apply("status", message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > status_async(
+			const msgpack::type::raw_ref& DB) {
+		KyotoTycoonService::status _Message;
+		_Message.DB = DB;
+		return status_async_apply(_Message);
 	}
 };
 
