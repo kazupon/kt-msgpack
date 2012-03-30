@@ -131,8 +131,20 @@ private:
 	struct timeval m_start_time;
 
 private:
-  void ping(msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
+  void ping (msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " ping");
     req.result(true);
+  }
+
+  void echo (msgpack::rpc::request::type<std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " echo");
+    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
+    for (std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
+      msgpack::type::raw_ref key(it->first.ptr, it->first.size);
+      msgpack::type::raw_ref value(it->second.ptr, it->second.size);
+      refoutmap.insert(std::make_pair(key, value));
+    }
+    req.result(refoutmap);
   }
 
   /*

@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_b3c5767d_HPP__
-#define MPRPC_KyotoTycoonService_client_b3c5767d_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_5e32b65d_HPP__
+#define MPRPC_KyotoTycoonService_client_5e32b65d_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -37,6 +37,29 @@ public:
 			) {
 		KyotoTycoonService::ping _Message;
 		return ping_async_apply(_Message);
+	}
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  echo_apply(
+			const KyotoTycoonService::echo& message) {
+		return instance.call_apply("echo", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+	}
+
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  echo(
+			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+		KyotoTycoonService::echo _Message;
+		_Message.inmap = inmap;
+		return echo_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > echo_async_apply(
+			const KyotoTycoonService::echo& message) {
+		return instance.call_apply("echo", message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > echo_async(
+			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+		KyotoTycoonService::echo _Message;
+		_Message.inmap = inmap;
+		return echo_async_apply(_Message);
 	}
 };
 

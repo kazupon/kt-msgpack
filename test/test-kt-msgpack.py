@@ -11,7 +11,10 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     result = self._client.call('ping')
     self.assertTrue(result)
   def test_echo(self):
-    args = { 'hoge': 1, 'foo': 'bar' }
+    args = { 'hoge': '1', 'foo': 'bar' }
+    result = self._client.call('echo', args)
+    self.assertEquals(result, args)
+    args = {}
     result = self._client.call('echo', args)
     self.assertEquals(result, args)
 
