@@ -28,6 +28,35 @@ Configure and install in the usual way:
 
     $ ktserver -plsv /usr/local/libexec/libktmsgpack.so -plex 'port=18801'
 
+## Procedures
+
+### ping
+Do nothing, just for testing.
+
+#### parameters
+none
+
+#### return value
+true on success
+
+### echo
+Echo back the input data as the output data, just for testing.
+
+#### parameters
+- inmap: arbitrary parameters.(optional) 
+
+#### return value
+corresponding parameters to the input data.
+
+### report
+Get the report of the server information.
+
+#### parameters
+none
+
+#### return value
+arbitrary records.
+
 
 ## License
 
