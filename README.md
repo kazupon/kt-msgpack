@@ -81,8 +81,10 @@ Add a record.
 - xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
 
 #### return value
-- true: success.
-- false: existing record was detected.
+Return the type of int32 value. Contains the following data.
+- 0: succees.
+- 1: existing record was detected.
+- 2: not exist a database.
 
 ## License
 
