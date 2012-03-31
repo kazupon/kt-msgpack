@@ -89,6 +89,28 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # invalid parameter.
     self.assertRaises(error.RPCError, lambda: self._client.call('add'))
 
+  def test_set(self):
+    # normal
+    ret1 = self._client.call('set', 'set1', 'set1')
+    self.assertIsNone(ret1);
   
+    # specific database name.
+    ret2 = self._client.call('set', 'set1', '1', 'casket2.kct')
+    self.assertIsNone(ret2);
+
+    # not exist database name.
+    try:
+      self._client.call('set', 'bar', '1', 'xxxx.kct')
+      self.assertTrue(False)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34);
+
+    # invalid parameter.
+    try:
+      self._client.call('set')
+      self.assertTrue(False)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2);
+
 if __name__ == '__main__':
   unittest.main()

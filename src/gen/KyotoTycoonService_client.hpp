@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_427fdf52_HPP__
-#define MPRPC_KyotoTycoonService_client_427fdf52_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_b3b7787b_HPP__
+#define MPRPC_KyotoTycoonService_client_b3b7787b_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -133,6 +133,35 @@ public:
 		_Message.DB = DB;
 		_Message.xt = xt;
 		return add_async_apply(_Message);
+	}
+	void set_apply(
+			const KyotoTycoonService::set& message) {
+		instance.call_apply("set", message).get<void>();
+	}
+
+	void set(
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+		KyotoTycoonService::set _Message;
+		_Message.key = key;
+		_Message.value = value;
+		_Message.DB = DB;
+		_Message.xt = xt;
+		return set_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> set_async_apply(
+			const KyotoTycoonService::set& message) {
+		return instance.call_apply("set", message);
+	}
+
+	msgpack::rpc::future::type<void> set_async(
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+		KyotoTycoonService::set _Message;
+		_Message.key = key;
+		_Message.value = value;
+		_Message.DB = DB;
+		_Message.xt = xt;
+		return set_async_apply(_Message);
 	}
 };
 

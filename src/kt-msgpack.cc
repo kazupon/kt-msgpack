@@ -6,7 +6,14 @@
 #define MODNAME "msgpack-rpc"
 #define LOG_PREFIX MODNAME ": "
 
+#define ERROR_CODE_OFFSET 32
+#define ERR_UNEXPECTED_ERROR    (0 + ERROR_CODE_OFFSET)
+#define ERR_EXSISTING_RECORD    (1 + ERROR_CODE_OFFSET)
+#define ERR_NOT_FOUND_DATABASE  (2 + ERROR_CODE_OFFSET)
+
+
 namespace {
+
 
 namespace kc = kyotocabinet;
 namespace kt = kyototycoon;
@@ -257,6 +264,33 @@ private:
         req.error(1); // TODO: should be designed error spec.
       }
     }
+  }
+
+  void set(msgpack::rpc::request::type<void> req, KyotoTycoonService::set& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " set");
+
+    kt::TimedDB* db = NULL;
+    if (params.DB.ptr != NULL) {
+      std::string name(params.DB.ptr, params.DB.size);
+      db = get_db(name);
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    bool success = db->set(params.key.ptr, params.key.size, params.value.ptr, params.value.size, params.xt);
+    if (!success) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e) {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR); // TODO: should be designed error !!
+      }
+    }
+
+    req.result();
   }
 
   /*
