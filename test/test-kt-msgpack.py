@@ -71,9 +71,13 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
   def test_add(self):
     ret1 = self._client.call('add', 'hoge', 'foo')
-    self.assertTrue(ret1)
+    self.assertEqual(ret1, 0)
     ret2 = self._client.call('add', 'hoge', 'foo')
-    self.assertFalse(ret2)
+    self.assertEqual(ret2, 1)
+    ret3 = self._client.call('add', 'bar', '1', 'casket2.kct')
+    self.assertEqual(ret3, 0)
+    ret4 = self._client.call('add', 'bar', '1', 'xxxx.kct')
+    self.assertEqual(ret4, 1)
 
   
 if __name__ == '__main__':
