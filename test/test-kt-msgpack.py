@@ -69,6 +69,12 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     for key in reports:
       self.assertTrue(ret2.has_key(key))
 
+  def test_add(self):
+    ret1 = self._client.call('add', 'hoge', 'foo')
+    self.assertTrue(ret1)
+    ret2 = self._client.call('add', 'hoge', 'foo')
+    self.assertFalse(ret2)
+
   
 if __name__ == '__main__':
   unittest.main()
