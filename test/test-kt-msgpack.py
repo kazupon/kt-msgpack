@@ -126,7 +126,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # get value
     self._client.call('set', 'get1', 'get1')
     ret1 = self._client.call('get', 'get1')
-    self.assertEqual(ret1, { 'value': 'get1' })
+    self.assertEqual(ret1, { u'value': u'get1' })
 
     # get value & xt
     # TODO
@@ -137,7 +137,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # specific database name.
     self._client.call('set', 'get3', '1', 'casket2.kct')
     ret3 = self._client.call('get', 'get3', 'casket2.kct')
-    self.assertEqual(ret3, { 'value': '1' })
+    self.assertEqual(ret3, { u'value': u'1' })
 
     # specific key of no existing record.
     try:

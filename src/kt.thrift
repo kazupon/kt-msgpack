@@ -9,4 +9,5 @@ service KyotoTycoonService {
     map<bytes, bytes> status(1:optional bytes DB = "")
     void add(1:bytes key, 2:bytes value, 3:optional bytes DB = "", 4:optional int64 xt = C_INT64_MAX)
     void set(1:bytes key, 2:bytes value, 3:optional bytes DB = "", 4:optional int64 xt = C_INT64_MAX)
+    map<bytes, bytes> get(1:bytes key, 2:optional bytes DB = "")
 }

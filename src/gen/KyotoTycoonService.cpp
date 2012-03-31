@@ -43,6 +43,12 @@ static void dispatch_set(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->set(*preq, message);
 }
+static void dispatch_get(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::get message;
+	preq->params().convert(&message);
+	svr->get(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -57,6 +63,7 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("status", &dispatch_status));
 	table->insert(std::make_pair("add", &dispatch_add));
 	table->insert(std::make_pair("set", &dispatch_set));
+	table->insert(std::make_pair("get", &dispatch_get));
 	TABLE = (void*)table.release();
 }
 

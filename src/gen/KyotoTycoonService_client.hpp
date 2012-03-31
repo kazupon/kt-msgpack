@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_c2ffc49d_HPP__
-#define MPRPC_KyotoTycoonService_client_c2ffc49d_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_23b564e0_HPP__
+#define MPRPC_KyotoTycoonService_client_23b564e0_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -162,6 +162,31 @@ public:
 		_Message.DB = DB;
 		_Message.xt = xt;
 		return set_async_apply(_Message);
+	}
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get_apply(
+			const KyotoTycoonService::get& message) {
+		return instance.call_apply("get", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+	}
+
+	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get(
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& DB) {
+		KyotoTycoonService::get _Message;
+		_Message.key = key;
+		_Message.DB = DB;
+		return get_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > get_async_apply(
+			const KyotoTycoonService::get& message) {
+		return instance.call_apply("get", message);
+	}
+
+	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > get_async(
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& DB) {
+		KyotoTycoonService::get _Message;
+		_Message.key = key;
+		_Message.DB = DB;
+		return get_async_apply(_Message);
 	}
 };
 

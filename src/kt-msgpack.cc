@@ -10,6 +10,7 @@
 #define ERR_UNEXPECTED_ERROR    (0 + ERROR_CODE_OFFSET)
 #define ERR_EXSISTING_RECORD    (1 + ERROR_CODE_OFFSET)
 #define ERR_NOT_FOUND_DATABASE  (2 + ERROR_CODE_OFFSET)
+#define ERR_NO_RECORD           (3 + ERROR_CODE_OFFSET)
 
 
 namespace {
@@ -285,38 +286,55 @@ private:
     if (!success) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
-        req.error(ERR_UNEXPECTED_ERROR); // TODO: should be designed error !!
+        log(m_logger, Logger::ERROR, LOG_PREFIX " set procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
       }
     }
 
     req.result();
   }
 
-  /*
-	void count(msgpack::rpc::request::type<uint64_t> req, KyotoTyrantService::count& params) {
-		req.result(get_db()->count());
-	}
+  void get(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::get& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " get");
 
-	void size(msgpack::rpc::request::type<uint64_t> req, KyotoTyrantService::size& params) {
-		req.result(get_db()->size());
-	}
+    kt::TimedDB* db = NULL;
+    if (params.DB.ptr != NULL) {
+      std::string name(params.DB.ptr, params.DB.size);
+      db = get_db(name);
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
 
-	void set(msgpack::rpc::request::type<void> req, KyotoTyrantService::set& params) {
-		bool success = get_db()->set(params.key.ptr, params.key.size,
-				params.value.ptr, params.value.size, params.xt);
-		if(!success) {
-			throw_error("set failed");
+    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
+		size_t vsiz;
+    int64_t xt;
+		char* vbuf = db->get(params.key.ptr, params.key.size, &vsiz, &xt);
+		if (vbuf == NULL) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::NOREC) {
+        req.error(ERR_NO_RECORD);
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " get procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+      }
+		} else {
+      log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
+      std::string buf(vbuf, vsiz);
+      insert_to_map(refoutmap, "value", "%s", buf.c_str());
+      //delete[] vbuf;
+      if (xt < kt::TimedDB::XTMAX) {
+        insert_to_map(refoutmap, "xt", "%lld", (long long)xt);
+      }
+			req.zone()->push_finalizer(&::free, vbuf);
+			req.result(refoutmap);
 		}
-		req.result();
-	}
+  }
 
-	void add(msgpack::rpc::request::type<bool> req, KyotoTyrantService::add& params) {
-		bool success = get_db()->add(params.key.ptr, params.key.size,
-				params.value.ptr, params.value.size, params.xt);
-		req.result(success);
-	}
-
+  /*
 	void replace(msgpack::rpc::request::type<bool> req, KyotoTyrantService::replace& params) {
 		bool success = get_db()->replace(params.key.ptr, params.key.size,
 				params.value.ptr, params.value.size, params.xt);
@@ -405,16 +423,17 @@ private:
     return (index != -1) ? &m_dbary[index] : NULL;
   }
 
-  void set_message(
+  void insert_to_map(
       std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, 
-      std::string& key,
+      const char* key,
       const char* format, ...) {
     std::string msg;
-    msgpack::type::raw_ref refkey(key.c_str(), key.size());
+    std::string str_key(key);
     va_list ap;
     va_start(ap, format);
     kc::vstrprintf(&msg, format, ap);
     va_end(ap);
+    msgpack::type::raw_ref refkey(str_key.c_str(), str_key.size());
     msgpack::type::raw_ref refmsg(msg.c_str(), msg.size());
     map.insert(std::make_pair(refkey, refmsg));
   }
