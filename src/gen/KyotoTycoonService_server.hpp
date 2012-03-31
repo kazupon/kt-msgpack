@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_server_70f02574_HPP__
-#define MPRPC_KyotoTycoonService_server_70f02574_HPP__
+#ifndef MPRPC_KyotoTycoonService_server_1dd44f68_HPP__
+#define MPRPC_KyotoTycoonService_server_1dd44f68_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -28,7 +28,7 @@ private:
 	friend class dispatch_table;
 
 public:
-	virtual void ping(msgpack::rpc::request::type<bool>, KyotoTycoonService::ping&) = 0;
+	virtual void ping(msgpack::rpc::request::type<void>, KyotoTycoonService::ping&) = 0;
 	virtual void echo(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >, KyotoTycoonService::echo&) = 0;
 	virtual void report(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >, KyotoTycoonService::report&) = 0;
 	virtual void status(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >, KyotoTycoonService::status&) = 0;
@@ -42,7 +42,7 @@ public:
 
 
 /*
-void KyotoTycoonService::server::ping(msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params)
+void KyotoTycoonService::server::ping(msgpack::rpc::request::type<void> req, KyotoTycoonService::ping& params)
 void KyotoTycoonService::server::echo(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params)
 void KyotoTycoonService::server::report(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::report& params)
 void KyotoTycoonService::server::status(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::status& params)

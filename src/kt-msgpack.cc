@@ -156,24 +156,28 @@ private:
   struct timeval m_start_time;
 
 private:
-  void ping(msgpack::rpc::request::type<bool> req, KyotoTycoonService::ping& params) {
+  void ping(msgpack::rpc::request::type<void> req, KyotoTycoonService::ping& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " ping");
-    req.result(true);
+
+    req.result();
   }
 
   void echo(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " echo");
+
     std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
     for (std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
       msgpack::type::raw_ref key(it->first.ptr, it->first.size);
       msgpack::type::raw_ref value(it->second.ptr, it->second.size);
       refoutmap.insert(std::make_pair(key, value));
     }
+
     req.result(refoutmap);
   }
 
   void report(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::report& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " report");
+
     std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refreport;
     double tout = 0;
     kt::RemoteDB db;
@@ -205,19 +209,19 @@ private:
 
   void status(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::status& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " status");
+
     std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refstatus;
 
     kt::TimedDB* db = NULL;
-    if (params.DB.ptr != NULL) {
-      std::string name(params.DB.ptr, params.DB.size);
-      db = get_db(name);
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
     } else {
       db = get_db();
     }
-
     if (db == NULL) {
-      // TODO: error
-      req.error(1);
+      req.error(ERR_NOT_FOUND_DATABASE);
       return;
     }
 
@@ -230,8 +234,8 @@ private:
       }
     } else {
       const kc::BasicDB::Error& e = db->error();
-      // TODO: error
-      req.error(1);
+      log(m_logger, Logger::ERROR, LOG_PREFIX " status procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
 
@@ -242,9 +246,10 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " add");
 
     kt::TimedDB* db = NULL;
-    if (params.DB.ptr != NULL) {
-      std::string name(params.DB.ptr, params.DB.size);
-      db = get_db(name);
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
     } else {
       db = get_db();
     }
@@ -253,7 +258,10 @@ private:
       return;
     }
 
-		bool success = db->add(params.key.ptr, params.key.size, params.value.ptr, params.value.size, params.xt);
+    uint32_t s_xt_size;
+    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+		bool success = db->add(params.key.ptr, params.key.size, params.value.ptr, params.value.size, xt);
     if (success) {
       req.result();
     } else {
@@ -271,9 +279,10 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " set");
 
     kt::TimedDB* db = NULL;
-    if (params.DB.ptr != NULL) {
-      std::string name(params.DB.ptr, params.DB.size);
-      db = get_db(name);
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
     } else {
       db = get_db();
     }
@@ -282,7 +291,10 @@ private:
       return;
     }
 
-    bool success = db->set(params.key.ptr, params.key.size, params.value.ptr, params.value.size, params.xt);
+    uint32_t s_xt_size;
+    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+    bool success = db->set(params.key.ptr, params.key.size, params.value.ptr, params.value.size, xt);
     if (!success) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
@@ -298,9 +310,10 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " get");
 
     kt::TimedDB* db = NULL;
-    if (params.DB.ptr != NULL) {
-      std::string name(params.DB.ptr, params.DB.size);
-      db = get_db(name);
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
     } else {
       db = get_db();
     }
@@ -323,9 +336,7 @@ private:
       }
 		} else {
       log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
-      std::string buf(vbuf, vsiz);
-      insert_to_map(refoutmap, "value", "%s", buf.c_str());
-      //delete[] vbuf;
+      insert_to_map(refoutmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
         insert_to_map(refoutmap, "xt", "%lld", (long long)xt);
       }
@@ -421,6 +432,21 @@ private:
       index = it->second;
     }
     return (index != -1) ? &m_dbary[index] : NULL;
+  }
+
+  const char* get_c_str_from_map(std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, const char* key, uint32_t *ret_size) {
+    std::string str_key(key);
+    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it = map.find(msgpack::type::raw_ref(str_key.c_str(), str_key.size()));
+    if (it == map.end()) {
+      if (ret_size) {
+        *ret_size = 0;
+      }
+      return NULL;
+    }
+    if (ret_size) {
+      *ret_size = it->second.size;
+    }
+    return it->second.ptr;
   }
 
   void insert_to_map(

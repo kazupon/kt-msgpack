@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_23b564e0_HPP__
-#define MPRPC_KyotoTycoonService_client_23b564e0_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_05917f4a_HPP__
+#define MPRPC_KyotoTycoonService_client_05917f4a_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -17,23 +17,23 @@ public:
 
 	~client() { }
 
-	bool ping_apply(
+	void ping_apply(
 			const KyotoTycoonService::ping& message) {
-		return instance.call_apply("ping", message).get<bool>();
+		instance.call_apply("ping", message).get<void>();
 	}
 
-	bool ping(
+	void ping(
 			) {
 		KyotoTycoonService::ping _Message;
 		return ping_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<bool> ping_async_apply(
+	msgpack::rpc::future::type<void> ping_async_apply(
 			const KyotoTycoonService::ping& message) {
 		return instance.call_apply("ping", message);
 	}
 
-	msgpack::rpc::future::type<bool> ping_async(
+	msgpack::rpc::future::type<void> ping_async(
 			) {
 		KyotoTycoonService::ping _Message;
 		return ping_async_apply(_Message);
@@ -88,9 +88,9 @@ public:
 	}
 
 	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  status(
-			const msgpack::type::raw_ref& DB) {
+			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::status _Message;
-		_Message.DB = DB;
+		_Message.inmap = inmap;
 		return status_apply(_Message);
 	}
 
@@ -100,9 +100,9 @@ public:
 	}
 
 	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > status_async(
-			const msgpack::type::raw_ref& DB) {
+			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::status _Message;
-		_Message.DB = DB;
+		_Message.inmap = inmap;
 		return status_async_apply(_Message);
 	}
 	void add_apply(
@@ -111,12 +111,11 @@ public:
 	}
 
 	void add(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;
 		_Message.value = value;
-		_Message.DB = DB;
-		_Message.xt = xt;
+		_Message.inmap = inmap;
 		return add_apply(_Message);
 	}
 
@@ -126,12 +125,11 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> add_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;
 		_Message.value = value;
-		_Message.DB = DB;
-		_Message.xt = xt;
+		_Message.inmap = inmap;
 		return add_async_apply(_Message);
 	}
 	void set_apply(
@@ -140,12 +138,11 @@ public:
 	}
 
 	void set(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::set _Message;
 		_Message.key = key;
 		_Message.value = value;
-		_Message.DB = DB;
-		_Message.xt = xt;
+		_Message.inmap = inmap;
 		return set_apply(_Message);
 	}
 
@@ -155,12 +152,11 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> set_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
+			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::set _Message;
 		_Message.key = key;
 		_Message.value = value;
-		_Message.DB = DB;
-		_Message.xt = xt;
+		_Message.inmap = inmap;
 		return set_async_apply(_Message);
 	}
 	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get_apply(
@@ -169,10 +165,10 @@ public:
 	}
 
 	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& DB) {
+			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::get _Message;
 		_Message.key = key;
-		_Message.DB = DB;
+		_Message.inmap = inmap;
 		return get_apply(_Message);
 	}
 
@@ -182,10 +178,10 @@ public:
 	}
 
 	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > get_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& DB) {
+			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
 		KyotoTycoonService::get _Message;
 		_Message.key = key;
-		_Message.DB = DB;
+		_Message.inmap = inmap;
 		return get_async_apply(_Message);
 	}
 };
