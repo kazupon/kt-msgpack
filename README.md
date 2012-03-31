@@ -3,6 +3,7 @@ kt-msgpack
 MessagePack-RPC Server Plugin for Kyoto Tycoon
 
 
+
 ## Requirements
 
 Following programs are requred to build:
@@ -12,6 +13,7 @@ Following programs are requred to build:
   - [mpio](http://github.com/frsyuki/mpio) >= 0.3.5
   - [MessagePack-RPC for C++](http://msgpack.org/) >= 0.3.0
   - [Kyoto Tycoon](http://fallabs.com/kyototycoon/)
+
 
 
 ## Installation
@@ -24,9 +26,12 @@ Configure and install in the usual way:
     $ sudo make install
 
 
+
 ## Example
 
     $ ktserver -plsv /usr/local/libexec/libktmsgpack.so -plex 'port=18801'
+
+
 
 ## Procedures
 
@@ -36,8 +41,9 @@ Do nothing, just for testing.
 #### parameters
 none
 
-#### return value
+#### return
 true on success
+
 
 ### echo
 Echo back the input data as the output data, just for testing.
@@ -45,8 +51,9 @@ Echo back the input data as the output data, just for testing.
 #### parameters
 - inmap: arbitrary parameters.(optional) 
 
-#### return value
+#### return
 corresponding parameters to the input data.
+
 
 ### report
 Get the report of the server information.
@@ -54,8 +61,9 @@ Get the report of the server information.
 #### parameters
 none
 
-#### return value
+#### return
 arbitrary records.
+
 
 ### status
 Get the miscellaneous status information of a database.
@@ -63,13 +71,14 @@ Get the miscellaneous status information of a database.
 #### parameters
 - DB: the database identifier. (optional)
 
-#### return value
+#### return
 Returns the type of map data that contains information status.
 Contains the following data.
 
 - count: the number of records.
 - size: the size of the database file.
 - (optional): arbitrary records for other information.
+
 
 ### add
 Add a record.
@@ -80,11 +89,36 @@ Add a record.
 - DB: the database identifier. (optional)
 - xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
 
-#### return value
-Return the type of int32 value. Contains the following data.
-- 0: succees.
-- 1: existing record was detected.
-- 2: not exist a database.
+#### return
+Return `nil` of msgpack.
+
+#### error
+The following error codes returned in the response.
+- 33: existing record was detected.
+- 34: not exist a database.
+
+
+### set
+Set the value of a record.
+
+#### parameters
+- key: the key of the record.
+- value: the value of the record.
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+
+#### return
+Return `nil` of msgpack.
+
+#### error
+The following error codes returned in the response.
+- 34: not exist a database.
+
+
+## Error codes
+- 32: Unexpected error.
+- 33: existing record was detected.
+- 34: not exist a database.
 
 ## License
 
