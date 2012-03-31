@@ -71,6 +71,19 @@ Contains the following data.
 - size: the size of the database file.
 - (optional): arbitrary records for other information.
 
+### add
+Add a record.
+
+#### parameters
+- key: the key of the record.
+- value: the value of the record.
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+
+#### return value
+- true: success.
+- false: existing record was detected.
+
 ## License
 
     Copyright (C) 2010 FURUHASHI Sadayuki
