@@ -122,5 +122,44 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     except error.RPCError as e:
       self.assertEqual(e.args[0], 2);
 
+  def test_get(self):
+    # get value
+    self._client.call('set', 'get1', 'get1')
+    ret1 = self._client.call('get', 'get1')
+    self.assertEqual(ret1, { 'value': 'get1' })
+
+    # get value & xt
+    # TODO
+    #self._client.call('set', 'get2', 'get2', '', 100000)
+    #ret2 = self._client.call('get', 'get1')
+    #self.assertEqual(ret1, { 'value': 'get1', 'xt': '100000' })
+
+    # specific database name.
+    self._client.call('set', 'get3', '1', 'casket2.kct')
+    ret3 = self._client.call('get', 'get3', 'casket2.kct')
+    self.assertEqual(ret3, { 'value': '1' })
+
+    # specific key of no existing record.
+    try:
+      self._client.call('get', 'xxxx')
+      self.assertTrue(False)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35);
+
+    # not exist database name.
+    try:
+      self._client.call('get', 'xxxx', 'xxxx.kct')
+      self.assertTrue(False)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34);
+
+    # invalid parameter.
+    try:
+      self._client.call('get')
+      self.assertTrue(False)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2);
+
+
 if __name__ == '__main__':
   unittest.main()
