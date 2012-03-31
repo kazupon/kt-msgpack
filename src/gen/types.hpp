@@ -1,5 +1,5 @@
-#ifndef MPRPC_TYPES_954246cc_HPP__
-#define MPRPC_TYPES_954246cc_HPP__
+#ifndef MPRPC_TYPES_0fc6d2cd_HPP__
+#define MPRPC_TYPES_0fc6d2cd_HPP__
 
 #include <msgpack/rpc/client.h>
 #include <msgpack/rpc/server.h>

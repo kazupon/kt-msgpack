@@ -229,6 +229,36 @@ private:
 
     req.result(refstatus);
   }
+
+  void add(msgpack::rpc::request::type<int8_t> req, KyotoTycoonService::add& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " add");
+
+    kt::TimedDB* db = NULL;
+    if (params.DB.ptr != NULL) {
+      std::string name(params.DB.ptr, params.DB.size);
+      db = get_db(name);
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.result(2); // not exit database.
+      return;
+    }
+
+		bool success = db->add(params.key.ptr, params.key.size, params.value.ptr, params.value.size, params.xt);
+    if (success) {
+      req.result(0);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::DUPREC) {
+        req.result(1); // exsisting record error.
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(1); // TODO: should be designed error spec.
+      }
+    }
+  }
+
   /*
 	void count(msgpack::rpc::request::type<uint64_t> req, KyotoTyrantService::count& params) {
 		req.result(get_db()->count());
@@ -333,12 +363,12 @@ private:
   }
 
   kt::TimedDB* get_db(const std::string& name) {
-    int32_t index = 0;
+    int32_t index = -1;
     std::map<std::string, int32_t>::const_iterator it = m_dbmap.find(name);
     if (it != m_dbmap.end()) {
       index = it->second;
     }
-    return &m_dbary[index];
+    return (index != -1) ? &m_dbary[index] : NULL;
   }
 
   void set_message(
