@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_b3b7787b_HPP__
-#define MPRPC_KyotoTycoonService_client_b3b7787b_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_c2ffc49d_HPP__
+#define MPRPC_KyotoTycoonService_client_c2ffc49d_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -105,12 +105,12 @@ public:
 		_Message.DB = DB;
 		return status_async_apply(_Message);
 	}
-	int8_t add_apply(
+	void add_apply(
 			const KyotoTycoonService::add& message) {
-		return instance.call_apply("add", message).get<int8_t>();
+		instance.call_apply("add", message).get<void>();
 	}
 
-	int8_t add(
+	void add(
 			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;
@@ -120,12 +120,12 @@ public:
 		return add_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<int8_t> add_async_apply(
+	msgpack::rpc::future::type<void> add_async_apply(
 			const KyotoTycoonService::add& message) {
 		return instance.call_apply("add", message);
 	}
 
-	msgpack::rpc::future::type<int8_t> add_async(
+	msgpack::rpc::future::type<void> add_async(
 			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const msgpack::type::raw_ref& DB, const int64_t& xt) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;

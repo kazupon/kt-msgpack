@@ -237,7 +237,7 @@ private:
     req.result(refstatus);
   }
 
-  void add(msgpack::rpc::request::type<int8_t> req, KyotoTycoonService::add& params) {
+  void add(msgpack::rpc::request::type<void> req, KyotoTycoonService::add& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " add");
 
     kt::TimedDB* db = NULL;
@@ -248,20 +248,20 @@ private:
       db = get_db();
     }
     if (db == NULL) {
-      req.result(2); // not exit database.
+      req.error(ERR_NOT_FOUND_DATABASE);
       return;
     }
 
 		bool success = db->add(params.key.ptr, params.key.size, params.value.ptr, params.value.size, params.xt);
     if (success) {
-      req.result(0);
+      req.result();
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e == kc::BasicDB::Error::DUPREC) {
-        req.result(1); // exsisting record error.
+        req.error(ERR_EXSISTING_RECORD);
       } else {
         log(m_logger, Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
-        req.error(1); // TODO: should be designed error spec.
+        req.error(ERR_UNEXPECTED_ERROR);
       }
     }
   }
