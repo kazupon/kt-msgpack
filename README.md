@@ -114,11 +114,31 @@ Return `nil` of msgpack.
 The following error codes returned in the response.
 - 34: not exist a database.
 
+### get
+Retrieve the value of a record.
+
+#### parameters
+- key: the key of the record.
+- DB: the database identifier. (optional)
+
+#### return
+Returns the type map that contains the following keys.
+- value: the value of the record. 
+- xt: the absolute expiration time. If it is omitted, there is no expiration time.
+
+#### error
+The following error codes returned in the response.
+- 34: no exist a database.
+- 35: no record was found.
+
 
 ## Error codes
-- 32: Unexpected error.
+- 32: unexpected error.
 - 33: existing record was detected.
-- 34: not exist a database.
+- 34: no exist a database.
+- 35: no record was found.
+
+
 
 ## License
 
