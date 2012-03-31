@@ -45,6 +45,7 @@ Configure and install in the usual way:
         void add(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
         void set(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
         map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
+        void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
     }
 
 
@@ -187,6 +188,32 @@ the following error codes returned in the response.
 - 34: no exist a database.
 - 35: no record was found.
 - 36: invalid parameters.
+
+
+### remove
+    void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
+
+Remove a record.
+
+#### parameters
+specify the following parameters.
+
+- key: the key of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+
+#### return
+none.
+
+#### error
+the following error codes returned in the response.
+
+- 34: no exist a database.
+- 35: no record was found.
+- 36: invalid parameters.
+
 
 
 ## Error codes
