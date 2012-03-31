@@ -345,6 +345,34 @@ private:
 		}
   }
 
+  void remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::remove& params) {
+		log(m_logger, Logger::INFO, LOG_PREFIX " remove");
+
+    kt::TimedDB* db = NULL;
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+		if (!db->remove(params.key.ptr, params.key.size)) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::NOREC) {
+        req.error(ERR_NO_RECORD);
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " remove procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+      }
+		} else {
+			req.result();
+		}
+  }
   /*
 	void replace(msgpack::rpc::request::type<bool> req, KyotoTyrantService::replace& params) {
 		bool success = get_db()->replace(params.key.ptr, params.key.size,

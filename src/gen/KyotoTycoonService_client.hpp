@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_05917f4a_HPP__
-#define MPRPC_KyotoTycoonService_client_05917f4a_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_f9c159a3_HPP__
+#define MPRPC_KyotoTycoonService_client_f9c159a3_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -183,6 +183,31 @@ public:
 		_Message.key = key;
 		_Message.inmap = inmap;
 		return get_async_apply(_Message);
+	}
+	void remove_apply(
+			const KyotoTycoonService::remove& message) {
+		instance.call_apply("remove", message).get<void>();
+	}
+
+	void remove(
+			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+		KyotoTycoonService::remove _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return remove_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> remove_async_apply(
+			const KyotoTycoonService::remove& message) {
+		return instance.call_apply("remove", message);
+	}
+
+	msgpack::rpc::future::type<void> remove_async(
+			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+		KyotoTycoonService::remove _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return remove_async_apply(_Message);
 	}
 };
 
