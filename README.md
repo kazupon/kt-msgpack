@@ -35,108 +35,167 @@ Configure and install in the usual way:
 
 ## Procedures
 
+### IDL
+
+    service KyotoTycoonService {
+        void ping()
+        map<bytes, bytes> echo(1:optional map<bytes, bytes> inmap)
+        map<bytes, bytes> report()
+        map<bytes, bytes> status(1:optional map<bytes, bytes> inmap)
+        void add(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+        void set(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+        map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
+    }
+
+
 ### ping
+    void ping()
+
 Do nothing, just for testing.
+This procedure is an alias of HTTP protocol `/rpc/void`.
 
 #### parameters
-none
+none.
 
 #### return
-true on success
+none.
 
 
 ### echo
+    map<bytes, bytes> echo(1:optional map<bytes, bytes> inmap)
+
 Echo back the input data as the output data, just for testing.
 
 #### parameters
-- inmap: arbitrary parameters.(optional) 
+if necessary, specify the arbitrary keys in `inmap` parameter.
+
+- inmap: arbitrary keys. (optional)
 
 #### return
 corresponding parameters to the input data.
 
 
 ### report
-Get the report of the server information.
+    map<bytes, bytes> report()
+
+Get the report of the database server information.
 
 #### parameters
-none
+none.
 
 #### return
-arbitrary records.
+report of the database server information.
 
 
 ### status
+    map<bytes, bytes> status(1:optional map<bytes, bytes> inmap)
+
 Get the miscellaneous status information of a database.
 
 #### parameters
+specify the following keys in `inmap`.
+
 - DB: the database identifier. (optional)
 
 #### return
-Returns the type of map data that contains information status.
-Contains the following data.
+returns the map data that contains the following keys.
 
 - count: the number of records.
 - size: the size of the database file.
 - (optional): arbitrary records for other information.
 
+#### error
+none.
+
 
 ### add
+    void add(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+
 Add a record.
 
 #### parameters
-- key: the key of the record.
-- value: the value of the record.
+specify the following parameters.
+
+- key: the key of the record. (required)
+- value: the value of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
 - DB: the database identifier. (optional)
 - xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
 
 #### return
-Return `nil` of msgpack.
+none.
 
 #### error
-The following error codes returned in the response.
+the following error codes returned in the response.
+
 - 33: existing record was detected.
 - 34: not exist a database.
+- 36: invalid parameters.
 
 
 ### set
+    void set(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+
 Set the value of a record.
 
 #### parameters
-- key: the key of the record.
-- value: the value of the record.
+specify the following parameters.
+
+- key: the key of the record. (required)
+- value: the value of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
 - DB: the database identifier. (optional)
 - xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
 
 #### return
-Return `nil` of msgpack.
+none.
 
 #### error
-The following error codes returned in the response.
+the following error codes returned in the response.
+
 - 34: not exist a database.
+- 36: invalid parameters.
+
 
 ### get
+    map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
+
 Retrieve the value of a record.
 
 #### parameters
-- key: the key of the record.
+specify the following parameters.
+
+- key: the key of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
 - DB: the database identifier. (optional)
 
 #### return
-Returns the type map that contains the following keys.
+returns the map data that contains the following keys.
+
 - value: the value of the record. 
 - xt: the absolute expiration time. If it is omitted, there is no expiration time.
 
 #### error
-The following error codes returned in the response.
+the following error codes returned in the response.
+
 - 34: no exist a database.
 - 35: no record was found.
+- 36: invalid parameters.
 
 
 ## Error codes
+
 - 32: unexpected error.
 - 33: existing record was detected.
 - 34: no exist a database.
 - 35: no record was found.
+- 36: invalid parameters.
 
 
 
