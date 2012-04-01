@@ -484,7 +484,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
   def test_match_prefix(self):
     num = 10
-    for i in range(1, num):
+    for i in range(0, num):
       self._client.call('set', '_mprefix' + str(i), str(i))
       self._client.call('set', 'mprefix' + str(i), str(i))
       self._client.call('set', '_mprefix' + str(i), str(i), { 'DB': 'casket2.kct' })
@@ -492,20 +492,17 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     
     # normal
     ret1 = self._client.call('match_prefix', '_')
-    print 'match_prefix ret1:', ret1
     self.assertEqual(ret1.get('num'), u'10')
-    for i in range(1, num):
-      self.assertEqual(ret1.get('_mprefix' + str(i)), u'' + str(i))
+    for i in range(0, num):
+      self.assertEqual(ret1.get('__mprefix' + str(i)), u'_mprefix' + str(i))
 
     # specific max
     ret2 = self._client.call('match_prefix', '_', { 'max': '5' })
-    print 'match_prefix ret2:', ret2
     self.assertEqual(ret2.get('num'), u'5')
 
     # specific database name.
     ret3 = self._client.call('match_prefix', '_', { 'DB': 'casket2.kct' })
-    print 'match_prefix ret3:', ret3
-    self.assertEqual(ret3.get('num'), u'5')
+    self.assertEqual(ret3.get('num'), u'10')
 
     # not exist database name.
     try:

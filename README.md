@@ -431,7 +431,7 @@ also, if necessary, specify the following keys in `inmap` parameter.
 returns the map data that contains the following keys.
 
 - num: the number of retrieved keys.
-- (optional): arbitrary keys.
+- (optional): arbitrary keys which trail the character "_".
 
 #### error
 the following error codes returned in the response.

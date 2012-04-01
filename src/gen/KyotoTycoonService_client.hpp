@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_d3b9e443_HPP__
-#define MPRPC_KyotoTycoonService_client_d3b9e443_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_b6ab6eb8_HPP__
+#define MPRPC_KyotoTycoonService_client_b6ab6eb8_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -389,6 +389,31 @@ public:
 		_Message.num = num;
 		_Message.inmap = inmap;
 		return increment_double_async_apply(_Message);
+	}
+	std::map<std::string,std::string>  match_prefix_apply(
+			const KyotoTycoonService::match_prefix& message) {
+		return instance.call_apply("match_prefix", message).get<std::map<std::string,std::string> >();
+	}
+
+	std::map<std::string,std::string>  match_prefix(
+			const std::string& prefix, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::match_prefix _Message;
+		_Message.prefix = prefix;
+		_Message.inmap = inmap;
+		return match_prefix_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > match_prefix_async_apply(
+			const KyotoTycoonService::match_prefix& message) {
+		return instance.call_apply("match_prefix", message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > match_prefix_async(
+			const std::string& prefix, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::match_prefix _Message;
+		_Message.prefix = prefix;
+		_Message.inmap = inmap;
+		return match_prefix_async_apply(_Message);
 	}
 };
 

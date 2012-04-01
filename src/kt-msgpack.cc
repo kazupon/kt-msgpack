@@ -637,19 +637,49 @@ private:
     }
   }
 
+  void match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_prefix& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " match_prefix");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    const char* max_ptr = kt::strmapget(params.inmap, "max");
+    int64_t max = max_ptr ? kc::atoi(max_ptr) : -1;
+
+    std::vector<std::string> keys;
+    int64_t num = db->match_prefix(params.prefix, &keys, max);
+    if (num >= 0) {
+      map_t outmap;
+      insert_to_map(outmap, "num", "%lld", (long long)num);
+      std::vector<std::string>::iterator it = keys.begin();
+      std::vector<std::string>::iterator itend = keys.end();
+      while (it != itend) {
+        std::string key = "_";
+        key.append(*it);
+        outmap[key] = *it;
+        ++it;
+      }
+      req.result(outmap);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e) {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " match_prefix procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+  }
   /*
-	void match_prefix(msgpack::rpc::request::type<std::vector<msgpack::type::raw_ref> > req, KyotoTyrantService::match_prefix& params) {
-		std::vector<std::string>* strvec = req.zone()->allocate<std::vector<std::string> >();
-		std::string prefix(params.prefix.ptr, params.prefix.size);
-		if(get_db()->match_prefix(prefix, strvec, params.max) < 0) {
-			throw_error("match_prefix failed");
-		}
-
-		std::vector<msgpack::type::raw_ref> refvec;
-		string_vec_to_raw_ref_vec_nocopy(strvec, &refvec);
-		req.result(refvec);
-	}
-
 	void match_regex(msgpack::rpc::request::type<std::vector<msgpack::type::raw_ref> > req, KyotoTyrantService::match_regex& params) {
 		std::vector<std::string>* strvec = req.zone()->allocate<std::vector<std::string> >();
 		std::string regex(params.regex.ptr, params.regex.size);
