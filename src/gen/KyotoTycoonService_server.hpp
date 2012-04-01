@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_server_dbb6d950_HPP__
-#define MPRPC_KyotoTycoonService_server_dbb6d950_HPP__
+#ifndef MPRPC_KyotoTycoonService_server_61b5903e_HPP__
+#define MPRPC_KyotoTycoonService_server_61b5903e_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -46,6 +46,7 @@ public:
 	virtual void match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::match_prefix&) = 0;
 	virtual void match_regex(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::match_regex&) = 0;
 	virtual void set_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::set_bulk&) = 0;
+	virtual void remove_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::remove_bulk&) = 0;
 };
 
 
@@ -71,6 +72,7 @@ void KyotoTycoonService::server::increment_double(msgpack::rpc::request::type<st
 void KyotoTycoonService::server::match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_prefix& params)
 void KyotoTycoonService::server::match_regex(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_regex& params)
 void KyotoTycoonService::server::set_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::set_bulk& params)
+void KyotoTycoonService::server::remove_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::remove_bulk& params)
 */
 
 
