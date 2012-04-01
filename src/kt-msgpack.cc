@@ -21,7 +21,6 @@ namespace kt = kyototycoon;
 
 namespace rpc = msgpack::rpc;
 
-//class MessagePackServer : public kt::PluggableServer, public KyotoTyrantService::server {
 class MessagePackServer : public kt::PluggableServer, public KyotoTycoonService::server {
 public:
   MessagePackServer() { }
@@ -29,6 +28,7 @@ public:
 
 private:
   typedef kt::ThreadedServer::Logger Logger;
+  typedef std::map<std::string, std::string> map_t;
 
 private:
   static void log(Logger* logger, Logger::Kind kind, const char* format, ...) {
@@ -52,11 +52,11 @@ public:
     m_logger = logger;
     log(m_logger, Logger::SYSTEM, LOG_PREFIX " dbnum: %d", m_dbnum);
     log(m_logger, Logger::SYSTEM, LOG_PREFIX " configured expr:%s", expr);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX "  host=%s", m_cfg.host.c_str());
-    log(m_logger, Logger::DEBUG, LOG_PREFIX "  port=%d", m_cfg.port);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX "  thread=%d", m_cfg.thread);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX "  mhost=%s", m_cfg.master_host.c_str());
-    log(m_logger, Logger::DEBUG, LOG_PREFIX "  mport=%d", m_cfg.master_port);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " host=%s", m_cfg.host.c_str());
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " port=%d", m_cfg.port);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " thread=%d", m_cfg.thread);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " mhost=%s", m_cfg.master_host.c_str());
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " mport=%d", m_cfg.master_port);
 
     for (int32_t i = 0; i < m_dbnum; i++) {
       std::string path = m_dbary[i].path();
@@ -404,20 +404,52 @@ private:
 
     req.result();
   }
+
+  void seize(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::seize& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " seize");
+
+    kt::TimedDB* db = NULL;
+    uint32_t db_name_size;
+    //const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    const char* db_name = get_c_str_from_map1(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    map_t outmap;
+		size_t vsiz;
+    int64_t xt;
+		char* vbuf = db->seize(params.key.c_str(), params.key.size(), &vsiz, &xt);
+		if (vbuf == NULL) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::NOREC) {
+        req.error(ERR_NO_RECORD);
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " seize procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+      }
+		} else {
+      log(m_logger, Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
+      insert_to_map1(outmap, "value", "%s", vbuf);
+      if (xt < kt::TimedDB::XTMAX) {
+        insert_to_map1(outmap, "xt", "%lld", (long long)xt);
+      }
+			//req.zone()->push_finalizer(&::free, vbuf);
+			req.result(outmap);
+      delete[] vbuf;
+		}
+  }
   /*
 	void replace(msgpack::rpc::request::type<bool> req, KyotoTyrantService::replace& params) {
 		bool success = get_db()->replace(params.key.ptr, params.key.size,
 				params.value.ptr, params.value.size, params.xt);
 		req.result(success);
-	}
-
-	void append(msgpack::rpc::request::type<void> req, KyotoTyrantService::append& params) {
-		bool success = get_db()->append(params.key.ptr, params.key.size,
-				params.value.ptr, params.value.size, params.xt);
-		if(!success) {
-			throw_error("append failed");
-		}
-		req.result();
 	}
 
 	void cas(msgpack::rpc::request::type<bool> req, KyotoTyrantService::cas& params) {
@@ -426,22 +458,6 @@ private:
 				params.nvalue.ptr, params.nvalue.size,
 				params.xt);
 		req.result(success);
-	}
-
-	void remove(msgpack::rpc::request::type<bool> req, KyotoTyrantService::remove& params) {
-		bool success = get_db()->remove(params.key.ptr, params.key.size);
-		req.result(success);
-	}
-
-	void get(msgpack::rpc::request::type<msgpack::type::raw_ref> req, KyotoTyrantService::get& params) {
-		size_t vsiz;
-		char* vbuf = get_db()->get(params.key.ptr, params.key.size, &vsiz);
-		if(vbuf == NULL) {
-			req.result_nil();
-		} else {
-			req.zone()->push_finalizer(&::free, vbuf);
-			req.result(msgpack::type::raw_ref(vbuf, vsiz));
-		}
 	}
 
 	void match_prefix(msgpack::rpc::request::type<std::vector<msgpack::type::raw_ref> > req, KyotoTyrantService::match_prefix& params) {
@@ -493,6 +509,21 @@ private:
     return (index != -1) ? &m_dbary[index] : NULL;
   }
 
+  const char* get_c_str_from_map1(std::map<std::string, std::string>& map, const char* key, uint32_t *ret_size) {
+    std::string str_key(key);
+    std::map<std::string, std::string>::const_iterator it = map.find(str_key);
+    if (it == map.end()) {
+      if (ret_size) {
+        *ret_size = 0;
+      }
+      return NULL;
+    }
+    if (ret_size) {
+      *ret_size = it->second.size();
+    }
+    return it->second.c_str();
+  }
+
   const char* get_c_str_from_map(std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, const char* key, uint32_t *ret_size) {
     std::string str_key(key);
     std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it = map.find(msgpack::type::raw_ref(str_key.c_str(), str_key.size()));
@@ -506,6 +537,15 @@ private:
       *ret_size = it->second.size;
     }
     return it->second.ptr;
+  }
+
+  void insert_to_map1(map_t& map, const char* key, const char* format, ...) {
+    std::string msg;
+    va_list ap;
+    va_start(ap, format);
+    kc::vstrprintf(&msg, format, ap);
+    va_end(ap);
+    map.insert(std::make_pair(std::string(key), msg));
   }
 
   void insert_to_map(

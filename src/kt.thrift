@@ -12,4 +12,5 @@ service KyotoTycoonService {
     map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap = "") // HACK: map optional generating
     void remove(1:bytes key, 2:optional map<bytes, bytes> inmap = "") // HACK: map optional generating
     void append(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap = "") // HACK: map optional generating
+    map<string, string> seize(1:string key, 2:optional map<string, string> inmap = "") // HACK: map optional generating
 }

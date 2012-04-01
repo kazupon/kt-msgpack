@@ -15,18 +15,16 @@ class TestSeize(unittest.TestCase):
 
   def test_seize(self):
     # normal 
-    f1 = self._client.call_async('set', 'seize1', 'seize1')
-    f1.join()
+    self._client.call('set', 'seize1', 'seize1')
     ret1 = self._client.call('seize', 'seize1')
     self.assertEqual(ret1, { u'value': u'seize1' })
     try:
       self._client.call('seize', 'seize1')
     except error.RPCError as e:
-      self.assertEqual(err.args[0], 35);
+      self.assertEqual(e.args[0], 35);
 
     # expiration
-    f2 = self._client.call_async('set', 'seize2', 'seize2', { 'xt': '100000' })
-    f2.join()
+    self._client.call('set', 'seize2', 'seize2', { 'xt': '100000' })
     ret2 = self._client.call('seize', 'seize2')
     self.assertEqual(ret2['value'], u'seize2')
     self.assertTrue(ret2.has_key('xt'))
@@ -35,11 +33,10 @@ class TestSeize(unittest.TestCase):
     try:
       self._client.call('seize', 'xxxx')
     except error.RPCError as e:
-      self.assertEqual(err.args[0], 35);
+      self.assertEqual(e.args[0], 35);
 
     # specific database name.
-    f3 = self._client.call_async('set', 'seize3', '1', { 'DB': 'casket2.kct' })
-    f3.join()
+    self._client.call('set', 'seize3', '1', { 'DB': 'casket2.kct' })
     ret3 = self._client.call('seize', 'seize3', { 'DB': 'casket2.kct' })
     self.assertEqual(ret3, { u'value': u'1' })
 
@@ -47,13 +44,13 @@ class TestSeize(unittest.TestCase):
     try:
       self._client.call('seize', 'xxxx', { 'DB': 'xxxx.kct' })
     except error.RPCError as e:
-      self.assertEqual(err.args[0], 34)
+      self.assertEqual(e.args[0], 34)
 
     # specific no parameter.
     try:
       self._client.call('seize')
     except error.RPCError as e:
-      self.assertEqual(err.args[0], 2)
+      self.assertEqual(e.args[0], 2)
 
 
 if __name__ == '__main__':

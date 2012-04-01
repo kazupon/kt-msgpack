@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_server_29e22e2e_HPP__
-#define MPRPC_KyotoTycoonService_server_29e22e2e_HPP__
+#ifndef MPRPC_KyotoTycoonService_server_fb4c6958_HPP__
+#define MPRPC_KyotoTycoonService_server_fb4c6958_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -37,6 +37,7 @@ public:
 	virtual void get(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >, KyotoTycoonService::get&) = 0;
 	virtual void remove(msgpack::rpc::request::type<void>, KyotoTycoonService::remove&) = 0;
 	virtual void append(msgpack::rpc::request::type<void>, KyotoTycoonService::append&) = 0;
+	virtual void seize(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::seize&) = 0;
 };
 
 
@@ -53,6 +54,7 @@ void KyotoTycoonService::server::set(msgpack::rpc::request::type<void> req, Kyot
 void KyotoTycoonService::server::get(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::get& params)
 void KyotoTycoonService::server::remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::remove& params)
 void KyotoTycoonService::server::append(msgpack::rpc::request::type<void> req, KyotoTycoonService::append& params)
+void KyotoTycoonService::server::seize(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::seize& params)
 */
 
 

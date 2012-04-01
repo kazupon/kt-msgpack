@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_04af3ba0_HPP__
-#define MPRPC_KyotoTycoonService_client_04af3ba0_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_d462b369_HPP__
+#define MPRPC_KyotoTycoonService_client_d462b369_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -235,6 +235,31 @@ public:
 		_Message.value = value;
 		_Message.inmap = inmap;
 		return append_async_apply(_Message);
+	}
+	std::map<std::string,std::string>  seize_apply(
+			const KyotoTycoonService::seize& message) {
+		return instance.call_apply("seize", message).get<std::map<std::string,std::string> >();
+	}
+
+	std::map<std::string,std::string>  seize(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::seize _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return seize_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > seize_async_apply(
+			const KyotoTycoonService::seize& message) {
+		return instance.call_apply("seize", message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > seize_async(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::seize _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return seize_async_apply(_Message);
 	}
 };
 

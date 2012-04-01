@@ -61,6 +61,12 @@ static void dispatch_append(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->append(*preq, message);
 }
+static void dispatch_seize(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::seize message;
+	preq->params().convert(&message);
+	svr->seize(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -78,6 +84,7 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("get", &dispatch_get));
 	table->insert(std::make_pair("remove", &dispatch_remove));
 	table->insert(std::make_pair("append", &dispatch_append));
+	table->insert(std::make_pair("seize", &dispatch_seize));
 	TABLE = (void*)table.release();
 }
 

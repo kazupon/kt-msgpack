@@ -47,7 +47,7 @@ Configure and install in the usual way:
         map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
         void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
         void append(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
-        map<bytes, bytes> seize(1:bytes key, 2:optional map<bytes, bytes> inmap)
+        map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
     }
 
 
@@ -244,7 +244,7 @@ the following error codes returned in the response.
 
 
 ### seize
-    map<bytes, bytes> seize(1:bytes key, 2:optional map<bytes, bytes> inmap)
+    map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
 
 Retrieve the value of a record and remove it atomically.
 
