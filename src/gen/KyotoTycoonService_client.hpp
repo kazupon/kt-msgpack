@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_214a7fef_HPP__
-#define MPRPC_KyotoTycoonService_client_214a7fef_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_d3b9e443_HPP__
+#define MPRPC_KyotoTycoonService_client_d3b9e443_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -362,6 +362,33 @@ public:
 		_Message.num = num;
 		_Message.inmap = inmap;
 		return increment_async_apply(_Message);
+	}
+	std::map<std::string,std::string>  increment_double_apply(
+			const KyotoTycoonService::increment_double& message) {
+		return instance.call_apply("increment_double", message).get<std::map<std::string,std::string> >();
+	}
+
+	std::map<std::string,std::string>  increment_double(
+			const std::string& key, const std::string& num, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::increment_double _Message;
+		_Message.key = key;
+		_Message.num = num;
+		_Message.inmap = inmap;
+		return increment_double_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > increment_double_async_apply(
+			const KyotoTycoonService::increment_double& message) {
+		return instance.call_apply("increment_double", message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > increment_double_async(
+			const std::string& key, const std::string& num, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::increment_double _Message;
+		_Message.key = key;
+		_Message.num = num;
+		_Message.inmap = inmap;
+		return increment_double_async_apply(_Message);
 	}
 };
 

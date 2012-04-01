@@ -582,6 +582,61 @@ private:
     }
   }
 
+  void increment_double(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment_double& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " increment_double");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    double num = kc::atof(params.num.c_str());
+
+    const char* orig_ptr = kt::strmapget(params.inmap, "orig");
+    double orig;
+    if (orig_ptr) {
+      if (!std::strcmp(orig_ptr, "try")) {
+        orig = -kc::inf();
+      } else if (!std::strcmp(orig_ptr, "set")) {
+        orig = kc::inf();
+      } else {
+        orig = kc::atof(orig_ptr);
+      }
+    } else {
+      orig = 0;
+    }
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: orig = %f", orig);
+
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+
+    num = db->increment_double(params.key.c_str(), params.key.size(), num, orig, xt);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: num = %f", num);
+    if (!kc::chknan(num)) {
+      map_t outmap;
+      insert_to_map(outmap, "num", "%f", num);
+      req.result(outmap);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::LOGIC) {
+        req.error(ERR_EXSISTING_RECORD_NOT_COMPATIBLE);
+        return;
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " increment_double procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+  }
+
   /*
 	void match_prefix(msgpack::rpc::request::type<std::vector<msgpack::type::raw_ref> > req, KyotoTyrantService::match_prefix& params) {
 		std::vector<std::string>* strvec = req.zone()->allocate<std::vector<std::string> >();

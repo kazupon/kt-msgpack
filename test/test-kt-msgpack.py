@@ -449,11 +449,11 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
   def test_increment_double(self):
     # when no record, orig -> ommited,
     ret1 = self._client.call('increment_double', 'incd1', '1.1')
-    self.assertEqual(ret1, { u'num': u'1.1' })
+    self.assertEqual(ret1, { u'num': u'1.100000' })
 
     # when no record, orig -> number
     ret2 = self._client.call('increment_double', 'incd2', '10.0', { 'orig': '10.0' })
-    self.assertEqual(ret2, { u'num': u'20.0' })
+    self.assertEqual(ret2, { u'num': u'20.000000' })
 
     # when no record, orig -> 'try'
     try:
@@ -463,11 +463,11 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
     # when no record, orig -> 'set'
     ret4 = self._client.call('increment_double', 'incd4', '0.1', { 'orig': 'set' })
-    self.assertEqual(ret4, { u'num': u'0.1' })
+    self.assertEqual(ret4, { u'num': u'0.100000' })
 
     # specific database name.
     ret5 = self._client.call('increment_double', 'incd5', '-1.0', { 'DB': 'casket2.kct', 'orig': '1.0' })
-    self.assertEqual(ret5, { u'num': u'0.0' })
+    self.assertEqual(ret5, { u'num': u'0.000000' })
 
     # not exist database name.
     try:
@@ -477,7 +477,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
     # expiration
     ret6 = self._client.call('increment_double', 'incd7', '11.01', { 'xt': '10000' })
-    self.assertEqual(ret6, { u'num': u'11.01' })
+    self.assertEqual(ret6, { u'num': u'11.010000' })
     ret6 = self._client.call('get', 'incd7')
     self.assertEqual(ret6.get('value'), u'')
     self.assertTrue(ret6.has_key('xt'))
