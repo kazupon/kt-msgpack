@@ -51,6 +51,7 @@ Configure and install in the usual way:
         void clear(1:optional map<string, string> inmap)
         void replace(1:string key, 2:string value, 3:optional map<string, string> inmap)
         void cas(1:string key, 3:optional map<string, string> inmap)
+        map<string, string> increment(1:string key, 2:string num, 3:optional map<string, string> inmap)
     }
 
 
@@ -349,6 +350,36 @@ the following error codes returned in the response.
 - 37: the old value assumption was failed.
 
 
+### increment
+    map<string, string> increment(1:string key, 2:string num, 3:optional map<string, string> inmap)
+
+Add a number to the numeric integer value of a record.
+
+#### parameters
+specify the following parameters.
+
+- key: the key of the record. (required)
+- num: the additional number. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- orig: the origin number. If it is omitted, 0 is specified. "try" means INT64MIN. "set" means INT64MAX. (optional)
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+
+#### return
+returns the map data that contains the following keys.
+
+- num: the result value.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 36: invalid parameters.
+- 38: existing record was not compatible.
+
+
 ## Error codes
 
 - 32: unexpected error.
@@ -356,7 +387,8 @@ the following error codes returned in the response.
 - 34: no exist a database.
 - 35: no record was found.
 - 36: invalid parameters.
-- 37: the old value assumption was failed.
+- 37: old value assumption was failed.
+- 38: existing record was not compatible.
 
 
 
