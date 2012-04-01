@@ -446,6 +446,41 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(ret6.get('value'), u'')
     self.assertTrue(ret6.has_key('xt'))
 
+  def test_increment_double(self):
+    # when no record, orig -> ommited,
+    ret1 = self._client.call('increment_double', 'incd1', '1.1')
+    self.assertEqual(ret1, { u'num': u'1.1' })
+
+    # when no record, orig -> number
+    ret2 = self._client.call('increment_double', 'incd2', '10.0', { 'orig': '10.0' })
+    self.assertEqual(ret2, { u'num': u'20.0' })
+
+    # when no record, orig -> 'try'
+    try:
+      self._client.call('increment_double', 'incd3', '0', { 'orig': 'try' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 38)
+
+    # when no record, orig -> 'set'
+    ret4 = self._client.call('increment_double', 'incd4', '0.1', { 'orig': 'set' })
+    self.assertEqual(ret4, { u'num': u'0.1' })
+
+    # specific database name.
+    ret5 = self._client.call('increment_double', 'incd5', '-1.0', { 'DB': 'casket2.kct', 'orig': '1.0' })
+    self.assertEqual(ret5, { u'num': u'0.0' })
+
+    # not exist database name.
+    try:
+      self._client.call('increment_double', 'incd6', '1.0', { 'DB': 'xxxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # expiration
+    ret6 = self._client.call('increment_double', 'incd7', '11.01', { 'xt': '10000' })
+    self.assertEqual(ret6, { u'num': u'11.01' })
+    ret6 = self._client.call('get', 'incd7')
+    self.assertEqual(ret6.get('value'), u'')
+    self.assertTrue(ret6.has_key('xt'))
 
 if __name__ == '__main__':
   unittest.main()
