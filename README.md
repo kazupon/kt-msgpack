@@ -49,6 +49,7 @@ Configure and install in the usual way:
         void append(1:string key, 2:string value, 3:optional map<string, string> inmap)
         map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
         void clear(1:optional map<string, string> inmap)
+        void replace(1:string key, 2:string value, 3:optional map<string, string> inmap)
     }
 
 
@@ -291,6 +292,33 @@ none.
 the following error codes returned in the response.
 
 - 34: not exist a database.
+
+
+### replace
+    void replace(1:string key, 2:string value, 3:optional map<string, string> inmap)
+
+Replace the value of a record.
+
+#### parameters
+specify the following parameters.
+
+- key: the key of the record. (required)
+- value: the value of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+
+#### return
+none.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 36: invalid parameters.
+
 
 
 ## Error codes
