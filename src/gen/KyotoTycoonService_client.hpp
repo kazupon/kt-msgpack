@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_e1baee5c_HPP__
-#define MPRPC_KyotoTycoonService_client_e1baee5c_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_448a8a92_HPP__
+#define MPRPC_KyotoTycoonService_client_448a8a92_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -310,6 +310,31 @@ public:
 		_Message.value = value;
 		_Message.inmap = inmap;
 		return replace_async_apply(_Message);
+	}
+	void cas_apply(
+			const KyotoTycoonService::cas& message) {
+		instance.call_apply("cas", message).get<void>();
+	}
+
+	void cas(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cas _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return cas_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cas_async_apply(
+			const KyotoTycoonService::cas& message) {
+		return instance.call_apply("cas", message);
+	}
+
+	msgpack::rpc::future::type<void> cas_async(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cas _Message;
+		_Message.key = key;
+		_Message.inmap = inmap;
+		return cas_async_apply(_Message);
 	}
 };
 

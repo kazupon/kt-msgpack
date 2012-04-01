@@ -7,11 +7,12 @@
 #define LOG_PREFIX MODNAME ": "
 
 #define ERROR_CODE_OFFSET 32
-#define ERR_UNEXPECTED_ERROR    (0 + ERROR_CODE_OFFSET)
-#define ERR_EXSISTING_RECORD    (1 + ERROR_CODE_OFFSET)
-#define ERR_NOT_FOUND_DATABASE  (2 + ERROR_CODE_OFFSET)
-#define ERR_NO_RECORD           (3 + ERROR_CODE_OFFSET)
-#define ERR_INVALID_ARGUMENT    (4 + ERROR_CODE_OFFSET)
+#define ERR_UNEXPECTED_ERROR        (0 + ERROR_CODE_OFFSET)
+#define ERR_EXSISTING_RECORD        (1 + ERROR_CODE_OFFSET)
+#define ERR_NOT_FOUND_DATABASE      (2 + ERROR_CODE_OFFSET)
+#define ERR_NO_RECORD               (3 + ERROR_CODE_OFFSET)
+#define ERR_INVALID_ARGUMENT        (4 + ERROR_CODE_OFFSET)
+#define ERR_OLD_VALUE_ASSUMPTION    (5 + ERROR_CODE_OFFSET)
 
 
 namespace {
@@ -492,13 +493,45 @@ private:
     req.result();
   }
 
-  /*
-	void replace(msgpack::rpc::request::type<bool> req, KyotoTyrantService::replace& params) {
-		bool success = get_db()->replace(params.key.ptr, params.key.size,
-				params.value.ptr, params.value.size, params.xt);
-		req.result(success);
-	}
+  void cas(msgpack::rpc::request::type<void> req, KyotoTycoonService::cas& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cas");
 
+    kt::TimedDB* db = NULL;
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    size_t ovsiz;
+    const char* ovbuf = kt::strmapget(params.inmap, "oval", &ovsiz);
+    size_t nvsiz;
+    const char* nvbuf = kt::strmapget(params.inmap, "nval", &nvsiz);
+    uint32_t s_xt_size;
+    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+    if (!db->cas(params.key.c_str(), params.key.size(), ovbuf, ovsiz, nvbuf, nvsiz, xt)) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::LOGIC) {
+        req.error(ERR_OLD_VALUE_ASSUMPTION);
+        return;
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " cas procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+
+    req.result();
+  }
+
+  /*
 	void cas(msgpack::rpc::request::type<bool> req, KyotoTyrantService::cas& params) {
 		bool success = get_db()->cas(params.key.ptr, params.key.size,
 				params.ovalue.ptr, params.ovalue.size,

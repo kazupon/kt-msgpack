@@ -384,7 +384,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # when database existing record, oval -> specific match value, nval -> specific value
     self._client.call('cas', 'cas2', { 'oval': '1', 'nval': '3' })
     ret3 = self._client.call('get', 'cas2')
-    self.assertEqual(ret3, { u'value': u'2' })
+    self.assertEqual(ret3, { u'value': u'3' })
 
     # specific database name.
     self._client.call('append', 'cas3', 'hoge', { 'DB': 'casket2.kct' })
@@ -399,7 +399,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self.assertEqual(e.args[0], 34)
 
     # expiration
-    self._client.call('cas', 'cas2', { 'xt': '10000', 'oval': '2', 'nval': '10' })
+    self._client.call('cas', 'cas2', { 'xt': '10000', 'oval': '3', 'nval': '10' })
     ret4 = self._client.call('get', 'cas2')
     self.assertEqual(ret4.get('value'), u'10')
     self.assertTrue(ret4.has_key('xt'))
