@@ -13,6 +13,12 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
   def tearDown(self):
     self._client.close()
 
+  def create_inmap(self, base, num):
+    data = {}
+    for i in range(0, num):
+      data['_%s%d' % (base, i)] = str(i)
+    return data
+
   def test_ping(self):
     ret = self._client.call('ping')
     self.assertIsNone(ret)
@@ -550,14 +556,10 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
   def test_set_bulk(self):
     num = 10
-    def create_inmap(num):
-      data = {}
-      for i in range(0, num):
-        data['_%s%d' % ('set_bulk', i)] = str(i)
-      return data
+    base = 'set_bulk'
 
     # normal
-    inmap = create_inmap(num)
+    inmap = self.create_inmap(base, num)
     ret1 = self._client.call('set_bulk', inmap)
     self.assertEqual(ret1['num'], u'%d' % num)
     for i in range(0, 10):
@@ -565,27 +567,27 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self.assertEqual(ret['value'], u'%d' % i)
     
     # specific atomic
-    inmap = create_inmap(num)
+    inmap = self.create_inmap(base, num)
     inmap['atomic'] = str(True)
     ret2 = self._client.call('set_bulk', inmap)
     self.assertEqual(ret2['num'], u'%d' % num)
 
     # specific database name.
-    inmap = create_inmap(num)
+    inmap = self.create_inmap(base, num)
     inmap['DB'] = 'casket2.kct'
     ret3 = self._client.call('set_bulk', inmap)
     self.assertEqual(ret3['num'], u'%d' % num)
 
     # not exist database name.
     try:
-      inmap = create_inmap(num)
+      inmap = self.create_inmap(base, num)
       inmap['DB'] = 'xxxxx'
       self._client.call('set_bulk', inmap)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 34)
     
     # specific expiration
-    inmap = create_inmap(num)
+    inmap = self.create_inmap(base, num)
     inmap['xt'] = '100000'
     ret3 = self._client.call('set_bulk', inmap)
     self.assertEqual(ret3['num'], u'%d' % num)
@@ -597,6 +599,51 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     ret4 = self._client.call('set_bulk')
     self.assertEqual(ret4['num'], u'0')
     self.assertEqual(len(ret4), 1) # 'num' key only
+
+  def test_remove_bulk(self):
+    num = 100
+    base = 'remove_bulk'
+
+    # normal
+    inmap = self.create_inmap(base, num)
+    self._client.call('set_bulk', inmap)
+    ret1 = self._client.call('remove_bulk', inmap)
+    self.assertEqual(ret1['num'], u'%d' % num)
+    for i in range(0, num):
+      try:
+        self._client.call('get', '%s%d' % (base, i))
+      except error.RPCError as e:
+        self.assertEqual(e.args[0], 35)
+
+    # specific atomic
+    inmap = self.create_inmap(base, num)
+    inmap['atomic'] = str(True)
+    self._client.call('set_bulk', inmap)
+    ret2 = self._client.call('remove_bulk', inmap)
+    self.assertEqual(ret2['num'], u'%d' % num)
+
+    # specific database name.
+    inmap = self.create_inmap(base, num)
+    inmap['DB'] = 'casket2.kct'
+    self._client.call('set_bulk', inmap)
+    ret3 = self._client.call('remove_bulk', inmap)
+    self.assertEqual(ret3['num'], u'%d' % num)
+
+    # not exist database name.
+    try:
+      inmap = self.create_inmap(base, num)
+      inmap['DB'] = 'xxxxx'
+      self._client.call('remove_bulk', inmap)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+    
+    # specific no parameter.
+    inmap = self.create_inmap(base, num)
+    self._client.call('set_bulk', inmap)
+    ret4 = self._client.call('remove_bulk')
+    self.assertEqual(ret4['num'], u'0')
+    self.assertEqual(len(ret4), 1) # 'num' key only
+
 
 if __name__ == '__main__':
   unittest.main()
