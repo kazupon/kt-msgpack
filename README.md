@@ -47,6 +47,7 @@ Configure and install in the usual way:
         map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
         void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
         void append(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+        map<bytes, bytes> seize(1:bytes key, 2:optional map<bytes, bytes> inmap)
     }
 
 
@@ -239,6 +240,34 @@ none.
 the following error codes returned in the response.
 
 - 34: not exist a database.
+- 36: invalid parameters.
+
+
+### seize
+    map<bytes, bytes> seize(1:bytes key, 2:optional map<bytes, bytes> inmap)
+
+Retrieve the value of a record and remove it atomically.
+
+#### parameters
+specify the following parameters.
+
+- key: the key of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+
+#### return
+returns the map data that contains the following keys.
+
+- value: the value of the record. 
+- xt: the absolute expiration time. If it is omitted, there is no expiration time.
+
+#### error
+the following error codes returned in the response.
+
+- 34: no exist a database.
+- 35: no record was found.
 - 36: invalid parameters.
 
 
