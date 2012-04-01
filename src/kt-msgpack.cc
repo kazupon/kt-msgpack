@@ -723,17 +723,56 @@ private:
     }
   }
 
-  /*
-	void uptime(msgpack::rpc::request::type<double> req, KyotoTyrantService::uptime& params) {
-		struct timeval now;
-		gettimeofday(&now, NULL);
-		struct timeval t;
-		timersub(&now, &m_start_time, &t);
-		double sec = t.tv_sec + (double)t.tv_usec*1e-6;
-		req.result(sec);
-	}
-  */
+  void set_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::set_bulk& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " set_bulk");
 
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    const char* xt_ptr = kt::strmapget(params.inmap, "xt");
+    int64_t xt = xt_ptr ? kc::atoi(xt_ptr) : kc::INT64MAX;
+
+    const char* atomic_ptr = kt::strmapget(params.inmap, "atomic");
+    bool atomic = atomic_ptr ? true : false;
+                    
+    map_t records;
+    map_t::const_iterator it = params.inmap.begin();
+    map_t::const_iterator itend = params.inmap.end();
+    while (it != itend) {
+      const char* kbuf = it->first.data();
+      size_t ksiz = it->first.size();
+      if (ksiz > 0 && *kbuf == '_') {
+        std::string key(kbuf + 1, ksiz - 1);
+        std::string value(it->second.data(), it->second.size());
+        records[key] = value;
+      }
+      ++it;
+    }
+
+    int64_t num = db->set_bulk(records, xt, atomic);
+    if (num >= 0) {
+      map_t outmap;
+      insert_to_map(outmap, "num", "%lld", (long long)num);
+      req.result(outmap);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e) {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " set_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+  }
 
 private:
   kt::TimedDB* get_db() {

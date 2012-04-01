@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_59ebdbbc_HPP__
-#define MPRPC_KyotoTycoonService_client_59ebdbbc_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_08df96c3_HPP__
+#define MPRPC_KyotoTycoonService_client_08df96c3_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -439,6 +439,29 @@ public:
 		_Message.regex = regex;
 		_Message.inmap = inmap;
 		return match_regex_async_apply(_Message);
+	}
+	std::map<std::string,std::string>  set_bulk_apply(
+			const KyotoTycoonService::set_bulk& message) {
+		return instance.call_apply("set_bulk", message).get<std::map<std::string,std::string> >();
+	}
+
+	std::map<std::string,std::string>  set_bulk(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::set_bulk _Message;
+		_Message.inmap = inmap;
+		return set_bulk_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > set_bulk_async_apply(
+			const KyotoTycoonService::set_bulk& message) {
+		return instance.call_apply("set_bulk", message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > set_bulk_async(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::set_bulk _Message;
+		_Message.inmap = inmap;
+		return set_bulk_async_apply(_Message);
 	}
 };
 

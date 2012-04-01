@@ -566,7 +566,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     
     # specific atomic
     inmap = create_inmap(num)
-    inmap['atomic'] = True
+    inmap['atomic'] = str(True)
     ret2 = self._client.call('set_bulk', inmap)
     self.assertEqual(ret2['num'], u'%d' % num)
 
