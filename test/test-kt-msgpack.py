@@ -322,6 +322,38 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     except error.RPCError as e:
       self.assertEqual(e.args[0], 34)
 
+  def test_replace(self):
+    # normal
+    self._client.call('set', 'replace1', '1111')
+    ret1 = self._client.call('replace', 'replace1', '2222')
+    self.assertIsNone(ret1)
+    ret1 = self._client.call('get', 'replace1')
+    self.assertEqual(ret1, { u'value': u'2222' })
+
+    # specific database name.
+    self._client.call('append', 'replace2', '1', { 'DB': 'casket2.kct' })
+    self._client.call('replace', 'replace2', '2', { 'DB': 'casket2.kct' })
+    ret2 = self._client.call('get', 'replace2', { 'DB': 'casket2.kct' })
+    self.assertIsNone(ret2, { u'value': u'2' })
+
+    # not exist database name.
+    try:
+      self._client.call('replace', 'replace3', 'hgoe', { 'DB': 'xxxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # expiration
+    self._client.call('set', 'replace4', 'foo')
+    self._client.call('replace', 'replace4', 'bar', { 'xt': '10000' })
+    ret4 = self._client.call('get', 'replace4')
+    self.assertEqual(ret4.get('value'), u'bar')
+    self.assertTrue(ret4.has_key('xt'))
+
+    # specific no parameter.
+    try:
+      self._client.call('replace')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
 
 if __name__ == '__main__':
   unittest.main()
