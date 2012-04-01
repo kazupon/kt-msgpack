@@ -644,6 +644,47 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(ret4['num'], u'0')
     self.assertEqual(len(ret4), 1) # 'num' key only
 
+  def test_get_bulk(self):
+    num = 500
+    base = 'get_bulk'
+
+    # normal
+    inmap = self.create_inmap(base, num)
+    self._client.call('set_bulk', inmap)
+    ret1 = self._client.call('get_bulk', inmap)
+    self.assertEqual(ret1['num'], u'%d' % num)
+    for i in range(0, num):
+      self.assertEqual(ret1['_%s%d' % (base, i)], u'%d' % i)
+
+    # specific atomic
+    inmap = self.create_inmap(base, num)
+    inmap['atomic'] = str(True)
+    self._client.call('set_bulk', inmap)
+    ret2 = self._client.call('get_bulk', inmap)
+    self.assertEqual(ret2['num'], u'%d' % num)
+
+    # specific database name.
+    inmap = self.create_inmap(base, num)
+    inmap['DB'] = 'casket2.kct'
+    self._client.call('set_bulk', inmap)
+    ret3 = self._client.call('get_bulk', inmap)
+    self.assertEqual(ret3['num'], u'%d' % num)
+
+    # not exist database name.
+    try:
+      inmap = self.create_inmap(base, num)
+      inmap['DB'] = 'xxxxx'
+      self._client.call('get_bulk', inmap)
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+    
+    # specific no parameter.
+    inmap = self.create_inmap(base, num)
+    self._client.call('set_bulk', inmap)
+    ret4 = self._client.call('get_bulk')
+    self.assertEqual(ret4['num'], u'0')
+    self.assertEqual(len(ret4), 1) # 'num' key only
+
 
 if __name__ == '__main__':
   unittest.main()
