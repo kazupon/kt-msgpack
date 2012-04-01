@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_d462b369_HPP__
-#define MPRPC_KyotoTycoonService_client_d462b369_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_72afcf7b_HPP__
+#define MPRPC_KyotoTycoonService_client_72afcf7b_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -38,69 +38,69 @@ public:
 		KyotoTycoonService::ping _Message;
 		return ping_async_apply(_Message);
 	}
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  echo_apply(
+	std::map<std::string,std::string>  echo_apply(
 			const KyotoTycoonService::echo& message) {
-		return instance.call_apply("echo", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+		return instance.call_apply("echo", message).get<std::map<std::string,std::string> >();
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  echo(
-			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	std::map<std::string,std::string>  echo(
+			const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::echo _Message;
 		_Message.inmap = inmap;
 		return echo_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > echo_async_apply(
+	msgpack::rpc::future::type<std::map<std::string,std::string> > echo_async_apply(
 			const KyotoTycoonService::echo& message) {
 		return instance.call_apply("echo", message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > echo_async(
-			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	msgpack::rpc::future::type<std::map<std::string,std::string> > echo_async(
+			const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::echo _Message;
 		_Message.inmap = inmap;
 		return echo_async_apply(_Message);
 	}
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  report_apply(
+	std::map<std::string,std::string>  report_apply(
 			const KyotoTycoonService::report& message) {
-		return instance.call_apply("report", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+		return instance.call_apply("report", message).get<std::map<std::string,std::string> >();
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  report(
+	std::map<std::string,std::string>  report(
 			) {
 		KyotoTycoonService::report _Message;
 		return report_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > report_async_apply(
+	msgpack::rpc::future::type<std::map<std::string,std::string> > report_async_apply(
 			const KyotoTycoonService::report& message) {
 		return instance.call_apply("report", message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > report_async(
+	msgpack::rpc::future::type<std::map<std::string,std::string> > report_async(
 			) {
 		KyotoTycoonService::report _Message;
 		return report_async_apply(_Message);
 	}
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  status_apply(
+	std::map<std::string,std::string>  status_apply(
 			const KyotoTycoonService::status& message) {
-		return instance.call_apply("status", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+		return instance.call_apply("status", message).get<std::map<std::string,std::string> >();
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  status(
-			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	std::map<std::string,std::string>  status(
+			const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::status _Message;
 		_Message.inmap = inmap;
 		return status_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > status_async_apply(
+	msgpack::rpc::future::type<std::map<std::string,std::string> > status_async_apply(
 			const KyotoTycoonService::status& message) {
 		return instance.call_apply("status", message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > status_async(
-			const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	msgpack::rpc::future::type<std::map<std::string,std::string> > status_async(
+			const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::status _Message;
 		_Message.inmap = inmap;
 		return status_async_apply(_Message);
@@ -111,7 +111,7 @@ public:
 	}
 
 	void add(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;
 		_Message.value = value;
@@ -125,7 +125,7 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> add_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::add _Message;
 		_Message.key = key;
 		_Message.value = value;
@@ -138,7 +138,7 @@ public:
 	}
 
 	void set(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::set _Message;
 		_Message.key = key;
 		_Message.value = value;
@@ -152,33 +152,33 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> set_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::set _Message;
 		_Message.key = key;
 		_Message.value = value;
 		_Message.inmap = inmap;
 		return set_async_apply(_Message);
 	}
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get_apply(
+	std::map<std::string,std::string>  get_apply(
 			const KyotoTycoonService::get& message) {
-		return instance.call_apply("get", message).get<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> >();
+		return instance.call_apply("get", message).get<std::map<std::string,std::string> >();
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  get(
-			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	std::map<std::string,std::string>  get(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::get _Message;
 		_Message.key = key;
 		_Message.inmap = inmap;
 		return get_apply(_Message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > get_async_apply(
+	msgpack::rpc::future::type<std::map<std::string,std::string> > get_async_apply(
 			const KyotoTycoonService::get& message) {
 		return instance.call_apply("get", message);
 	}
 
-	msgpack::rpc::future::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > get_async(
-			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+	msgpack::rpc::future::type<std::map<std::string,std::string> > get_async(
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::get _Message;
 		_Message.key = key;
 		_Message.inmap = inmap;
@@ -190,7 +190,7 @@ public:
 	}
 
 	void remove(
-			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::remove _Message;
 		_Message.key = key;
 		_Message.inmap = inmap;
@@ -203,7 +203,7 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> remove_async(
-			const msgpack::type::raw_ref& key, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::remove _Message;
 		_Message.key = key;
 		_Message.inmap = inmap;
@@ -215,7 +215,7 @@ public:
 	}
 
 	void append(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::append _Message;
 		_Message.key = key;
 		_Message.value = value;
@@ -229,7 +229,7 @@ public:
 	}
 
 	msgpack::rpc::future::type<void> append_async(
-			const msgpack::type::raw_ref& key, const msgpack::type::raw_ref& value, const std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> & inmap) {
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
 		KyotoTycoonService::append _Message;
 		_Message.key = key;
 		_Message.value = value;

@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_a6760e3c_HPP__
-#define MPRPC_KyotoTycoonService_a6760e3c_HPP__
+#ifndef MPRPC_KyotoTycoonService_bb99f0e3_HPP__
+#define MPRPC_KyotoTycoonService_bb99f0e3_HPP__
 
 #include "types.hpp"
 
@@ -38,7 +38,7 @@ struct echo {
 	{
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -96,7 +96,7 @@ struct status {
 	{
 	}
 
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -129,9 +129,9 @@ struct add {
 	{
 	}
 
-	msgpack::type::raw_ref key;
-	msgpack::type::raw_ref value;
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::string key;
+	std::string value;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -172,9 +172,9 @@ struct set {
 	{
 	}
 
-	msgpack::type::raw_ref key;
-	msgpack::type::raw_ref value;
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::string key;
+	std::string value;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -215,8 +215,8 @@ struct get {
 	{
 	}
 
-	msgpack::type::raw_ref key;
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::string key;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -253,8 +253,8 @@ struct remove {
 	{
 	}
 
-	msgpack::type::raw_ref key;
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::string key;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {
@@ -291,9 +291,9 @@ struct append {
 	{
 	}
 
-	msgpack::type::raw_ref key;
-	msgpack::type::raw_ref value;
-	std::map<msgpack::type::raw_ref,msgpack::type::raw_ref>  inmap;
+	std::string key;
+	std::string value;
+	std::map<std::string,std::string>  inmap;
 
 	template <typename Packer>
 	void msgpack_pack(Packer& _Pk) const {

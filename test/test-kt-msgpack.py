@@ -209,9 +209,9 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # specific expiration time.
     ret3 = self._client.call('append', 'xt_append', '1', { 'xt': '1000' })
     self.assertIsNone(ret3)
-    ret3 = self._client.call_async('get', 'xt_append')
-    self.assertEqual(ret3.result.get('value'), u'1')
-    self.assertTrue(ret3.result.has_key('xt'))
+    ret3 = self._client.call('get', 'xt_append')
+    self.assertEqual(ret3.get('value'), u'1')
+    self.assertTrue(ret3.has_key('xt'))
 
     # specific no parameter.
     try:
@@ -294,6 +294,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self._client.call('seize')
     except error.RPCError as e:
       self.assertEqual(e.args[0], 2)
+
 
 if __name__ == '__main__':
   unittest.main()

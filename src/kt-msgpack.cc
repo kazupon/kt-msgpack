@@ -11,6 +11,7 @@
 #define ERR_EXSISTING_RECORD    (1 + ERROR_CODE_OFFSET)
 #define ERR_NOT_FOUND_DATABASE  (2 + ERROR_CODE_OFFSET)
 #define ERR_NO_RECORD           (3 + ERROR_CODE_OFFSET)
+#define ERR_INVALID_ARGUMENT    (4 + ERROR_CODE_OFFSET)
 
 
 namespace {
@@ -162,55 +163,52 @@ private:
     req.result();
   }
 
-  void echo(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> > req, KyotoTycoonService::echo& params) {
+  void echo(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::echo& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " echo");
 
-    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
-    for (std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
-      msgpack::type::raw_ref key(it->first.ptr, it->first.size);
-      msgpack::type::raw_ref value(it->second.ptr, it->second.size);
-      refoutmap.insert(std::make_pair(key, value));
+    map_t outmap;
+    for (map_t::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
+      outmap.insert(std::make_pair(std::string(it->first), std::string(it->second)));
     }
 
-    req.result(refoutmap);
+    req.result(outmap);
   }
 
-  void report(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::report& params) {
+  void report(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::report& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " report");
 
-    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refreport;
     double tout = 0;
     kt::RemoteDB db;
     if (!db.open(m_cfg.master_host.c_str(), m_cfg.master_port, tout)) {
-      req.error(1); // TODO: error 
+      kt::RemoteDB::Error e = db.error();
+      log(m_logger, Logger::ERROR, LOG_PREFIX " report db open error: %d: %s: %s", e.code(), e.name(), e.message());
+      req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
+
     bool err = false;
-    std::map<std::string, std::string> status;
-    if (db.report(&status)) {
-      std::map<std::string, std::string>::iterator it = status.begin();
-      std::map<std::string, std::string>::iterator itend = status.end();
-      while (it != itend) {
-        msgpack::type::raw_ref key(it->first.c_str(), it->first.size());
-        msgpack::type::raw_ref value(it->second.c_str(), it->second.size());
-        refreport.insert(std::make_pair(key, value));
-        ++it;
-      }
-    } else {
-      req.error(2); // TODO: error
+    map_t status;
+    if (!db.report(&status)) {
+      kt::RemoteDB::Error e = db.error();
+      log(m_logger, Logger::ERROR, LOG_PREFIX " report db report error: %d: %s: %s", e.code(), e.name(), e.message());
       err = true;
     }
+
     if (!db.close()) {
-      req.error(3); // TODO: error
+      kt::RemoteDB::Error e = db.error();
+      log(m_logger, Logger::ERROR, LOG_PREFIX " report db close error: %d: %s: %s", e.code(), e.name(), e.message());
       err = true;
     }
-    req.result(refreport);
+
+    if (err) {
+      req.error(ERR_UNEXPECTED_ERROR);
+    } else {
+      req.result(status);
+    }
   }
 
-  void status(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::status& params) {
+  void status(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::status& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " status");
-
-    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refstatus;
 
     kt::TimedDB* db = NULL;
     uint32_t db_name_size;
@@ -225,21 +223,15 @@ private:
       return;
     }
 
-    std::map<std::string, std::string> status;
-    if (db->status(&status)) {
-      for (std::map<std::string, std::string>::const_iterator it(status.begin()), it_end(status.end()); it != it_end; ++it) {
-        msgpack::type::raw_ref key(it->first.c_str(), it->first.size());
-        msgpack::type::raw_ref value(it->second.c_str(), it->second.size());
-        refstatus.insert(std::make_pair(key, value));
-      }
-    } else {
+    map_t status;
+    if (!db->status(&status)) {
       const kc::BasicDB::Error& e = db->error();
       log(m_logger, Logger::ERROR, LOG_PREFIX " status procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
 
-    req.result(refstatus);
+    req.result(status);
   }
 
   void add(msgpack::rpc::request::type<void> req, KyotoTycoonService::add& params) {
@@ -261,8 +253,7 @@ private:
     uint32_t s_xt_size;
     const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
-		bool success = db->add(params.key.ptr, params.key.size, params.value.ptr, params.value.size, xt);
-    if (success) {
+    if (db->add(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       req.result();
     } else {
       const kc::BasicDB::Error& e = db->error();
@@ -294,8 +285,7 @@ private:
     uint32_t s_xt_size;
     const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
-    bool success = db->set(params.key.ptr, params.key.size, params.value.ptr, params.value.size, xt);
-    if (!success) {
+    if (!db->set(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
         log(m_logger, Logger::ERROR, LOG_PREFIX " set procedure error: %d: %s: %s", e.code(), e.name(), e.message());
@@ -306,7 +296,7 @@ private:
     req.result();
   }
 
-  void get(msgpack::rpc::request::type<std::map<msgpack::type::raw_ref,msgpack::type::raw_ref> > req, KyotoTycoonService::get& params) {
+  void get(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::get& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " get");
 
     kt::TimedDB* db = NULL;
@@ -322,10 +312,9 @@ private:
       return;
     }
 
-    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref> refoutmap;
 		size_t vsiz;
     int64_t xt;
-		char* vbuf = db->get(params.key.ptr, params.key.size, &vsiz, &xt);
+		char* vbuf = db->get(params.key.c_str(), params.key.size(), &vsiz, &xt);
 		if (vbuf == NULL) {
       const kc::BasicDB::Error& e = db->error();
       if (e == kc::BasicDB::Error::NOREC) {
@@ -336,12 +325,13 @@ private:
       }
 		} else {
       log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
-      insert_to_map(refoutmap, "value", "%s", vbuf);
+      map_t outmap;
+      insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
-        insert_to_map(refoutmap, "xt", "%lld", (long long)xt);
+        insert_to_map(outmap, "xt", "%lld", (long long)xt);
       }
 			req.zone()->push_finalizer(&::free, vbuf);
-			req.result(refoutmap);
+			req.result(outmap);
 		}
   }
 
@@ -361,13 +351,14 @@ private:
       return;
     }
 
-		if (!db->remove(params.key.ptr, params.key.size)) {
+		if (!db->remove(params.key.c_str(), params.key.size())) {
       const kc::BasicDB::Error& e = db->error();
       if (e == kc::BasicDB::Error::NOREC) {
         req.error(ERR_NO_RECORD);
       } else {
         log(m_logger, Logger::ERROR, LOG_PREFIX " remove procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
+        return;
       }
 		} else {
 			req.result();
@@ -393,12 +384,12 @@ private:
     uint32_t s_xt_size;
     const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
-    bool success = db->append(params.key.ptr, params.key.size, params.value.ptr, params.value.size, xt);
-    if (!success) {
+    if (!db->append(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
         log(m_logger, Logger::ERROR, LOG_PREFIX " append procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
+        return;
       }
     }
 
@@ -410,8 +401,7 @@ private:
 
     kt::TimedDB* db = NULL;
     uint32_t db_name_size;
-    //const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
-    const char* db_name = get_c_str_from_map1(params.inmap, "DB", &db_name_size);
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -422,7 +412,6 @@ private:
       return;
     }
 
-    map_t outmap;
 		size_t vsiz;
     int64_t xt;
 		char* vbuf = db->seize(params.key.c_str(), params.key.size(), &vsiz, &xt);
@@ -436,13 +425,13 @@ private:
       }
 		} else {
       log(m_logger, Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
-      insert_to_map1(outmap, "value", "%s", vbuf);
+      map_t outmap;
+      insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
-        insert_to_map1(outmap, "xt", "%lld", (long long)xt);
+        insert_to_map(outmap, "xt", "%lld", (long long)xt);
       }
-			//req.zone()->push_finalizer(&::free, vbuf);
+			req.zone()->push_finalizer(&::free, vbuf);
 			req.result(outmap);
-      delete[] vbuf;
 		}
   }
   /*
@@ -509,7 +498,7 @@ private:
     return (index != -1) ? &m_dbary[index] : NULL;
   }
 
-  const char* get_c_str_from_map1(std::map<std::string, std::string>& map, const char* key, uint32_t *ret_size) {
+  const char* get_c_str_from_map(std::map<std::string, std::string>& map, const char* key, uint32_t *ret_size) {
     std::string str_key(key);
     std::map<std::string, std::string>::const_iterator it = map.find(str_key);
     if (it == map.end()) {
@@ -524,43 +513,13 @@ private:
     return it->second.c_str();
   }
 
-  const char* get_c_str_from_map(std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, const char* key, uint32_t *ret_size) {
-    std::string str_key(key);
-    std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>::const_iterator it = map.find(msgpack::type::raw_ref(str_key.c_str(), str_key.size()));
-    if (it == map.end()) {
-      if (ret_size) {
-        *ret_size = 0;
-      }
-      return NULL;
-    }
-    if (ret_size) {
-      *ret_size = it->second.size;
-    }
-    return it->second.ptr;
-  }
-
-  void insert_to_map1(map_t& map, const char* key, const char* format, ...) {
+  void insert_to_map(map_t& map, const char* key, const char* format, ...) {
     std::string msg;
     va_list ap;
     va_start(ap, format);
     kc::vstrprintf(&msg, format, ap);
     va_end(ap);
     map.insert(std::make_pair(std::string(key), msg));
-  }
-
-  void insert_to_map(
-      std::map<msgpack::type::raw_ref, msgpack::type::raw_ref>& map, 
-      const char* key,
-      const char* format, ...) {
-    std::string msg;
-    std::string str_key(key);
-    va_list ap;
-    va_start(ap, format);
-    kc::vstrprintf(&msg, format, ap);
-    va_end(ap);
-    msgpack::type::raw_ref refkey(str_key.c_str(), str_key.size());
-    msgpack::type::raw_ref refmsg(msg.c_str(), msg.size());
-    map.insert(std::make_pair(refkey, refmsg));
   }
 
   void throw_error(const std::string& msg) {
