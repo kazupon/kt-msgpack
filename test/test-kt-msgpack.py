@@ -354,6 +354,62 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self._client.call('replace')
     except error.RPCError as e:
       self.assertEqual(e.args[0], 2)
+  
+  def test_cas(self):
+    # when database no record, oval -> ommited, nval -> ommited
+    ret1 = self._client.call('cas', 'cas1')
+    self.assertIsNone(ret1)
+    try:
+      self._client.call('get', 'cas1')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # when database no record, oval -> ommited, nval -> specific value
+    self._client.call('cas', 'cas2', { 'nval': '1' })
+    ret2 = self._client.call('get', 'cas2')
+    self.assertEqual(ret2, { u'value': u'1' })
+
+    # when database existing record, oval -> ommited, nval -> ommited
+    try:
+      self._client.call('cas', 'cas2')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 37)
+    
+    # when database existing record, oval -> specific unmach value, nval -> ommited
+    try:
+      self._client.call('cas', 'cas2', { 'oval': '2' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 37)
+
+    # when database existing record, oval -> specific match value, nval -> specific value
+    self._client.call('cas', 'cas2', { 'oval': '1', 'nval': '3' })
+    ret3 = self._client.call('get', 'cas2')
+    self.assertEqual(ret3, { u'value': u'2' })
+
+    # specific database name.
+    self._client.call('append', 'cas3', 'hoge', { 'DB': 'casket2.kct' })
+    self._client.call('cas', 'cas3', { 'DB': 'casket2.kct', 'oval': 'hoge', 'nval': 'foo' })
+    ret4 = self._client.call('get', 'cas3', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret4, { u'value': u'foo' })
+
+    # not exist database name.
+    try:
+      self._client.call('cas', 'cas4', { 'DB': 'xxxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # expiration
+    self._client.call('cas', 'cas2', { 'xt': '10000', 'oval': '2', 'nval': '10' })
+    ret4 = self._client.call('get', 'cas2')
+    self.assertEqual(ret4.get('value'), u'10')
+    self.assertTrue(ret4.has_key('xt'))
+
+    # specific no parameter.
+    try:
+      self._client.call('cas')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
+
 
 if __name__ == '__main__':
   unittest.main()
