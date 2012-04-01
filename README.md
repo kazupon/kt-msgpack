@@ -55,6 +55,7 @@ Configure and install in the usual way:
         map<string, string> increment_double(1:string key, 2:string num, 3:optional map<string, string> inmap)
         map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap)
         map<string, string> match_regex(1:string regexp, 2:optional map<string, string> inmap)
+        map<string, string> set_bulk(1:optional map<string, string> inmap)
     }
 
 
@@ -421,7 +422,7 @@ Get keys matching a prefix string.
 #### parameters
 specify the following parameters.
 
-- prefix: the prefix string. (optional)
+- prefix: the prefix string. (required)
 
 also, if necessary, specify the following keys in `inmap` parameter.
 
@@ -449,7 +450,7 @@ Get keys matching a ragular expression string.
 #### parameters
 specify the following parameters.
 
-- regexp: the regular expression string. (optional)
+- regexp: the regular expression string. (required)
 
 also, if necessary, specify the following keys in `inmap` parameter.
 
@@ -467,6 +468,31 @@ the following error codes returned in the response.
 
 - 34: not exist a database.
 - 36: invalid parameters.
+
+
+### set_bulk
+    map<string, string> set_bulk(1:optional map<string, string> inmap)
+
+Store records at once.
+
+#### parameters
+specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+- atomic: to perform all operations atomically. If it is omitted, non-atomic operations are performed. (optional)
+- _xxx(optional): arbitrary records whose keys trail the character "_".
+
+#### return
+returns the map data that contains the following keys.
+
+- num: the number of stored reocrds.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+
 
 
 ## Error codes
