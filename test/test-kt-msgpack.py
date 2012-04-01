@@ -482,5 +482,42 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(ret6.get('value'), u'')
     self.assertTrue(ret6.has_key('xt'))
 
+  def test_match_prefix(self):
+    num = 10
+    for i in range(1, num):
+      self._client.call('set', '_mprefix' + str(i), str(i))
+      self._client.call('set', 'mprefix' + str(i), str(i))
+      self._client.call('set', '_mprefix' + str(i), str(i), { 'DB': 'casket2.kct' })
+      self._client.call('set', 'mprefix' + str(i), str(i), { 'DB': 'casket2.kct' })
+    
+    # normal
+    ret1 = self._client.call('match_prefix', '_')
+    print 'match_prefix ret1:', ret1
+    self.assertEqual(ret1.get('num'), u'10')
+    for i in range(1, num):
+      self.assertEqual(ret1.get('_mprefix' + str(i)), u'' + str(i))
+
+    # specific max
+    ret2 = self._client.call('match_prefix', '_', { 'max': '5' })
+    print 'match_prefix ret2:', ret2
+    self.assertEqual(ret2.get('num'), u'5')
+
+    # specific database name.
+    ret3 = self._client.call('match_prefix', '_', { 'DB': 'casket2.kct' })
+    print 'match_prefix ret3:', ret3
+    self.assertEqual(ret3.get('num'), u'5')
+
+    # not exist database name.
+    try:
+      self._client.call('match_prefix', '_', { 'DB': 'xxxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # specific no parameter.
+    try:
+      self._client.call('match_prefix')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
+
 if __name__ == '__main__':
   unittest.main()
