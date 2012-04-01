@@ -54,6 +54,7 @@ Configure and install in the usual way:
         map<string, string> increment(1:string key, 2:string num, 3:optional map<string, string> inmap)
         map<string, string> increment_double(1:string key, 2:string num, 3:optional map<string, string> inmap)
         map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap)
+        map<string, string> match_regex(1:string regexp, 2:optional map<string, string> inmap)
     }
 
 
@@ -431,7 +432,7 @@ also, if necessary, specify the following keys in `inmap` parameter.
 returns the map data that contains the following keys.
 
 - num: the number of retrieved keys.
-- (optional): arbitrary keys which trail the character "_".
+- _xxxx(optional): arbitrary keys which trail the character "_".
 
 #### error
 the following error codes returned in the response.
@@ -439,6 +440,33 @@ the following error codes returned in the response.
 - 34: not exist a database.
 - 36: invalid parameters.
 
+
+### match_regex
+    map<string, string> match_regex(1:string regexp, 2:optional map<string, string> inmap)
+
+Get keys matching a ragular expression string.
+
+#### parameters
+specify the following parameters.
+
+- regexp: the regular expression string. (optional)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- max: the maximum number to retrieve. If it is omitted or negative, no limit is specified.
+- DB: the database identifier. (optional)
+
+#### return
+returns the map data that contains the following keys.
+
+- num: the number of retrieved keys.
+- _xxxx(optional): arbitrary keys which trail the character "_".
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 36: invalid parameters.
 
 
 ## Error codes
