@@ -152,54 +152,148 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self.assertEqual(e.args[0], 2);
 
   def test_get(self):
-    that = self
+    # normal
+    self._client.call('set', 'get1', 'get1')
+    ret1 = self._client.call('get', 'get1')
+    self.assertEqual(ret1, { u'value': u'get1' })
 
-    # get value
-    def set1_result_handler(result):
-      ret1 = that._client.call('get', 'get1')
-      that.assertEqual(ret1, { u'value': u'get1' })
-
-    f1 = self._client.call_async('set', 'get1', 'get1')
-    f1.attach_result_handler(set1_result_handler)
-
-    # get value & xt
-    def set2_result_handler(result):
-      ret2 = that._client.call('get', 'get2')
-      that.assertEqual(ret2['value'], u'get2')
-      that.assertTrue(ret2.has_key('xt'))
-
-    f2 = self._client.call_async('set', 'get2', 'get2', { 'xt': '100000' })
-    f2.attach_result_handler(set2_result_handler)
+    # expiration
+    self._client.call('set', 'get2', 'get2', { 'xt': '100000' })
+    ret2 = self._client.call('get', 'get2')
+    self.assertEqual(ret2['value'], u'get2')
+    self.assertTrue(ret2.has_key('xt'))
 
     # specific key of no existing record.
-    def error_code_35_handler(err):
-      that.assertEqual(err.args[0], 35);
-    
-    f3 = self._client.call_async('get', 'xxxx')
-    f3.attach_error_handler(error_code_35_handler)
+    try:
+      self._client.call('get', 'xxxx')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35);
 
     # specific database name.
-    def set3_result_handler(result):
-      ret3 = that._client.call('get', 'get3', { 'DB': 'casket2.kct' })
-      that.assertEqual(ret3, { u'value': u'1' })
-
-    f4 = self._client.call_async('set', 'get3', '1', { 'DB': 'casket2.kct' })
-    f4.attach_result_handler(set3_result_handler)
+    self._client.call('set', 'get3', '1', { 'DB': 'casket2.kct' })
+    ret3 = self._client.call('get', 'get3', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret3, { u'value': u'1' })
 
     # not exist database name.
-    def error_code_34_handler(err):
-      that.assertEqual(err.args[0], 34)
-
-    f5 = self._client.call_async('get', 'xxxx', { 'DB': 'xxxx.kct' })
-    f5.attach_error_handler(error_code_34_handler)
+    try:
+      self._client.call('get', 'xxxx', { 'DB': 'xxxx.kct' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
 
     # specific no parameter.
-    def error_invalid_param_handler(err):
-      that.assertEqual(err.args[0], 2)
+    try:
+      self._client.call_async('get')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
 
-    f6 = self._client.call_async('get')
-    f6.attach_error_handler(error_invalid_param_handler)
+  def test_append(self):
+    # normal
+    ret1 = self._client.call('append', 'append1', 'hoge')
+    self.assertIsNone(ret1)
+    self._client.call('append', 'append1', 'hoge')
+    ret1 = self._client.call('get', 'append1')
+    self.assertEqual(ret1, { u'value': u'hogehoge' })
 
+    # specific database name.
+    ret2 = self._client.call('append', 'append2', 'hoge', { 'DB': 'casket2.kct' });
+    self.assertIsNone(ret2)
+    ret2 = self._client.call('get', 'append2', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret2, { u'value': u'hoge' })
+
+    # not exist database name.
+    try:
+      self._client.call('append', 'append3', 'hoge', { 'DB': 'xxxx' });
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # specific expiration time.
+    ret3 = self._client.call('append', 'xt_append', '1', { 'xt': '1000' })
+    self.assertIsNone(ret3)
+    ret3 = self._client.call_async('get', 'xt_append')
+    self.assertEqual(ret3.result.get('value'), u'1')
+    self.assertTrue(ret3.result.has_key('xt'))
+
+    # specific no parameter.
+    try:
+      self._client.call('append')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
+
+  def test_remove(self):
+    # normal
+    self._client.call('set', 'remove1', 'hoge')
+    ret1 = self._client.call('remove', 'remove1')
+    self.assertIsNone(ret1)
+    try:
+      self._client.call('get', 'remove1')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # specific key of no existing record.
+    try:
+      self._client.call('remove', 'remove2');
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # specific database name.
+    self._client.call('set', 'remove3', 'hoge', { 'DB': 'casket2.kct' });
+    ret2 = self._client.call('remove', 'remove3', { 'DB': 'casket2.kct' })
+    self.assertIsNone(ret2)
+    try:
+      self._client.call('get', 'remove3')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # not exist database name.
+    try:
+      self._client.call('remove', 'remove4', { 'DB': 'xxxx' });
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # specific no parameter.
+    try:
+      self._client.call('remove')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
+
+  def test_seize(self):
+    # normal 
+    self._client.call('set', 'seize1', 'seize1')
+    ret1 = self._client.call('seize', 'seize1')
+    self.assertEqual(ret1, { u'value': u'seize1' })
+    try:
+      self._client.call('seize', 'seize1')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35);
+
+    # expiration
+    self._client.call('set', 'seize2', 'seize2', { 'xt': '100000' })
+    ret2 = self._client.call('seize', 'seize2')
+    self.assertEqual(ret2['value'], u'seize2')
+    self.assertTrue(ret2.has_key('xt'))
+
+    # specific key of no existing record.
+    try:
+      self._client.call('seize', 'xxxx')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35);
+
+    # specific database name.
+    self._client.call('set', 'seize3', '1', { 'DB': 'casket2.kct' })
+    ret3 = self._client.call('seize', 'seize3', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret3, { u'value': u'1' })
+
+    # not exist database name.
+    try:
+      self._client.call('seize', 'xxxx', { 'DB': 'xxxx.kct' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # specific no parameter.
+    try:
+      self._client.call('seize')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
 
 if __name__ == '__main__':
   unittest.main()

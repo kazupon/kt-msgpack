@@ -13,21 +13,19 @@ class TestRemove(unittest.TestCase):
   def tearDown(self):
     self._client.close()
 
-  def test_remove(self):
-    that = self
-
+  def test_append(self):
     # normal
     ret1 = self._client.call('append', 'append1', 'hoge')
     self.assertIsNone(ret1)
-    #self._client.call('append', 'append1', 'hoge')
-    #ret1 = self._client.call('get', 'append1')
-    #self.assertEqual(ret1, { u'value': u'hogehoge' })
+    self._client.call('append', 'append1', 'hoge')
+    ret1 = self._client.call('get', 'append1')
+    self.assertEqual(ret1, { u'value': u'hogehoge' })
 
     # specific database name.
     ret2 = self._client.call('append', 'append2', 'hoge', { 'DB': 'casket2.kct' });
     self.assertIsNone(ret2)
-    #ret2 = self._client.call('get', 'append2', { 'DB': 'casket2.kct' })
-    #self.assertEqual(ret2, { u'value': u'hoge' })
+    ret2 = self._client.call('get', 'append2', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret2, { u'value': u'hoge' })
 
     # not exist database name.
     try:
@@ -38,9 +36,9 @@ class TestRemove(unittest.TestCase):
     # specific expiration time.
     ret3 = self._client.call('append', 'xt_append', '1', { 'xt': '1000' })
     self.assertIsNone(ret3)
-    #ret3 = self._client.call_async('get', 'xt_append')
-    #self.assertEqual(ret3.result.get('value'), u'1')
-    #self.assertTrue(ret3.result.has_key('xt'))
+    ret3 = self._client.call_async('get', 'xt_append')
+    self.assertEqual(ret3.result.get('value'), u'1')
+    self.assertTrue(ret3.result.has_key('xt'))
 
     # specific no parameter.
     try:

@@ -20,6 +20,10 @@ class TestRemove(unittest.TestCase):
     self._client.call('set', 'remove1', 'hoge')
     ret1 = self._client.call('remove', 'remove1')
     self.assertIsNone(ret1)
+    try:
+      self._client.call('get', 'remove1')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
 
     # specific key of no existing record.
     try:
@@ -31,6 +35,10 @@ class TestRemove(unittest.TestCase):
     self._client.call('set', 'remove3', 'hoge', { 'DB': 'casket2.kct' });
     ret2 = self._client.call('remove', 'remove3', { 'DB': 'casket2.kct' })
     self.assertIsNone(ret2)
+    try:
+      self._client.call('get', 'remove3')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
 
     # not exist database name.
     try:
