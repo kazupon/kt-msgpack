@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_server_adae3d83_HPP__
-#define MPRPC_KyotoTycoonService_server_adae3d83_HPP__
+#ifndef MPRPC_KyotoTycoonService_server_bd68a414_HPP__
+#define MPRPC_KyotoTycoonService_server_bd68a414_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -44,6 +44,7 @@ public:
 	virtual void increment(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::increment&) = 0;
 	virtual void increment_double(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::increment_double&) = 0;
 	virtual void match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::match_prefix&) = 0;
+	virtual void match_regex(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::match_regex&) = 0;
 };
 
 
@@ -67,6 +68,7 @@ void KyotoTycoonService::server::cas(msgpack::rpc::request::type<void> req, Kyot
 void KyotoTycoonService::server::increment(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment& params)
 void KyotoTycoonService::server::increment_double(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment_double& params)
 void KyotoTycoonService::server::match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_prefix& params)
+void KyotoTycoonService::server::match_regex(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_regex& params)
 */
 
 

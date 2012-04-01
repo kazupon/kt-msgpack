@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_220d6947_HPP__
-#define MPRPC_KyotoTycoonService_220d6947_HPP__
+#ifndef MPRPC_KyotoTycoonService_cbf4aed1_HPP__
+#define MPRPC_KyotoTycoonService_cbf4aed1_HPP__
 
 #include "types.hpp"
 
@@ -595,6 +595,44 @@ struct match_prefix {
 
 
 			_Array[0].convert(&prefix);
+
+
+			if(_Length <= 1) { return; }
+			if(!_Array[1].is_nil()) {
+				_Array[1].convert(&inmap);
+			}
+
+	}
+};
+struct match_regex {
+
+	match_regex()
+	{
+	}
+
+	std::string regex;
+	std::map<std::string,std::string>  inmap;
+
+	template <typename Packer>
+	void msgpack_pack(Packer& _Pk) const {
+		_Pk.pack_array(2);
+		_Pk.pack(regex);
+		_Pk.pack(inmap);
+	}
+
+	void msgpack_unpack(msgpack::object _Obj) {
+		if(_Obj.type != msgpack::type::ARRAY) {
+			throw msgpack::type_error();
+		}
+		const size_t _Length = _Obj.via.array.size;
+		msgpack::object* const _Array = _Obj.via.array.ptr;
+
+		if(_Length < 1) {
+			throw msgpack::type_error();
+		}
+
+
+			_Array[0].convert(&regex);
 
 
 			if(_Length <= 1) { return; }

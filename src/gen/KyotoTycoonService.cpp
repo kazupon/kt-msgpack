@@ -103,6 +103,12 @@ static void dispatch_match_prefix(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->match_prefix(*preq, message);
 }
+static void dispatch_match_regex(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::match_regex message;
+	preq->params().convert(&message);
+	svr->match_regex(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -127,6 +133,7 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("increment", &dispatch_increment));
 	table->insert(std::make_pair("increment_double", &dispatch_increment_double));
 	table->insert(std::make_pair("match_prefix", &dispatch_match_prefix));
+	table->insert(std::make_pair("match_regex", &dispatch_match_regex));
 	TABLE = (void*)table.release();
 }
 

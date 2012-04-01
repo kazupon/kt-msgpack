@@ -519,24 +519,22 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
   def test_match_regex(self):
     num = 10
     for i in range(0, num):
-      self._client.call('set', '_mregex' + str(i), str(i))
       self._client.call('set', 'mregex' + str(i), str(i))
-      self._client.call('set', '_mregex' + str(i), str(i), { 'DB': 'casket2.kct' })
       self._client.call('set', 'mregex' + str(i), str(i), { 'DB': 'casket2.kct' })
     
     # normal
-    ret1 = self._client.call('match_regex', 're')
-    self.assertEqual(ret1.get('num'), u'20')
-    for i in range(0, 20):
-      self.assertEqual(ret1.get('__mregex' + str(i)), u'_mregex' + str(i))
+    ret1 = self._client.call('match_regex', 'reg')
+    self.assertEqual(ret1.get('num'), u'10')
+    for i in range(0, num):
+      self.assertEqual(ret1.get('_mregex' + str(i)), u'mregex' + str(i))
 
     # specific max
-    ret2 = self._client.call('match_regex', 're', { 'max': '5' })
+    ret2 = self._client.call('match_regex', 'reg', { 'max': '5' })
     self.assertEqual(ret2.get('num'), u'5')
 
     # specific database name.
-    ret3 = self._client.call('match_regex', 're', { 'DB': 'casket2.kct' })
-    self.assertEqual(ret3.get('num'), u'20')
+    ret3 = self._client.call('match_regex', 'reg', { 'DB': 'casket2.kct' })
+    self.assertEqual(ret3.get('num'), u'10')
 
     # not exist database name.
     try:

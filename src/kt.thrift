@@ -19,4 +19,5 @@ service KyotoTycoonService {
     map<string, string> increment(1:string key, 2:string num, 3:optional map<string, string> inmap = "") // HACK: map optional generating
     map<string, string> increment_double(1:string key, 2:string num, 3:optional map<string, string> inmap = "") // HACK: map optional generating
     map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap = "") // HACK: map optional generating
+    map<string, string> match_regex(1:string regex, 2:optional map<string, string> inmap = "") // HACK: map optional generating
 }
