@@ -57,6 +57,7 @@ Configure and install in the usual way:
         map<string, string> match_regex(1:string regexp, 2:optional map<string, string> inmap)
         map<string, string> set_bulk(1:optional map<string, string> inmap)
         map<string, string> remove_bulk(1:optional map<string, string> inmap)
+        map<string, string> get_bulk(1:optional map<string, string> inmap)
     }
 
 
@@ -511,6 +512,36 @@ specify the following keys in `inmap` parameter.
 returns the map data that contains the following keys.
 
 - num: the number of removed reocrds.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+
+
+### get_bulk
+    map<string, string> get_bulk(1:optional map<string, string> inmap)
+
+Retrieve records at once.
+
+#### parameters
+specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+- atomic: to perform all operations atomically. If it is omitted, non-atomic operations are performed. (optional)
+- _xxx(optional): arbitrary records whose keys trail the character "_".
+
+#### return
+returns the map data that contains the following keys.
+
+- num: the number of removed reocrds.
+- _xxx(optional): arbitrary records whose keys trail the character "_".
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+
 
 
 ## Error codes
