@@ -7,12 +7,13 @@
 #define LOG_PREFIX MODNAME ": "
 
 #define ERROR_CODE_OFFSET 32
-#define ERR_UNEXPECTED_ERROR        (0 + ERROR_CODE_OFFSET)
-#define ERR_EXSISTING_RECORD        (1 + ERROR_CODE_OFFSET)
-#define ERR_NOT_FOUND_DATABASE      (2 + ERROR_CODE_OFFSET)
-#define ERR_NO_RECORD               (3 + ERROR_CODE_OFFSET)
-#define ERR_INVALID_ARGUMENT        (4 + ERROR_CODE_OFFSET)
-#define ERR_OLD_VALUE_ASSUMPTION    (5 + ERROR_CODE_OFFSET)
+#define ERR_UNEXPECTED_ERROR                  (0 + ERROR_CODE_OFFSET)
+#define ERR_EXSISTING_RECORD                  (1 + ERROR_CODE_OFFSET)
+#define ERR_NOT_FOUND_DATABASE                (2 + ERROR_CODE_OFFSET)
+#define ERR_NO_RECORD                         (3 + ERROR_CODE_OFFSET)
+#define ERR_INVALID_ARGUMENT                  (4 + ERROR_CODE_OFFSET)
+#define ERR_OLD_VALUE_ASSUMPTION              (5 + ERROR_CODE_OFFSET)
+#define ERR_EXSISTING_RECORD_NOT_COMPATIBLE   (6 + ERROR_CODE_OFFSET)
 
 
 namespace {
@@ -524,6 +525,61 @@ private:
     }
 
     req.result();
+  }
+
+  void increment(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " increment");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    int64_t num = kc::atoi(params.num.c_str());
+
+    const char* orig_ptr = kt::strmapget(params.inmap, "orig");
+    int64_t orig;
+    if (orig_ptr) {
+      if (!std::strcmp(orig_ptr, "try")) {
+        orig = kc::INT64MIN;
+      } else if (!std::strcmp(orig_ptr, "set")) {
+        orig = kc::INT64MAX;
+      } else {
+        orig = kc::atoi(orig_ptr);
+      }
+    } else {
+      orig = 0;
+    }
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: orig = %lld", (long long)orig);
+
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+
+    num = db->increment(params.key.c_str(), params.key.size(), num, orig, xt);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: num = %lld", (long long)num);
+    if (num != kc::INT64MIN) {
+      map_t outmap;
+      insert_to_map(outmap, "num", "%lld", (long long)num);
+      req.result(outmap);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e == kc::BasicDB::Error::LOGIC) {
+        req.error(ERR_EXSISTING_RECORD_NOT_COMPATIBLE);
+        return;
+      } else {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " increment procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
   }
 
   /*

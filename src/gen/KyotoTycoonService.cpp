@@ -85,6 +85,12 @@ static void dispatch_cas(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->cas(*preq, message);
 }
+static void dispatch_increment(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::increment message;
+	preq->params().convert(&message);
+	svr->increment(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -106,6 +112,7 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("clear", &dispatch_clear));
 	table->insert(std::make_pair("replace", &dispatch_replace));
 	table->insert(std::make_pair("cas", &dispatch_cas));
+	table->insert(std::make_pair("increment", &dispatch_increment));
 	TABLE = (void*)table.release();
 }
 

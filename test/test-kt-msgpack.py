@@ -420,16 +420,14 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(ret2, { u'num': u'20' })
 
     # when no record, orig -> 'try'
-    ret3 = self._client.call('increment', 'inc3', '0', { 'orig': 'try' })
-    self.assertEqual(ret3, { u'num': u'-9223372036854775808' })
-
-    # when no record, orig -> 'try'
-    ret3 = self._client.call('increment', 'inc3', '0', { 'orig': 'try' })
-    self.assertEqual(ret3, { u'num': u'-9223372036854775808' })
+    try:
+      self._client.call('increment', 'inc3', '0', { 'orig': 'try' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 38)
 
     # when no record, orig -> 'set'
-    ret4 = self._client.call('increment', 'inc4', '0', { 'orig': 'set' })
-    self.assertEqual(ret4, { u'num': u'9223372036854775807' })
+    ret4 = self._client.call('increment', 'inc4', '1', { 'orig': 'set' })
+    self.assertEqual(ret4, { u'num': u'1' })
 
     # specific database name.
     ret5 = self._client.call('increment', 'inc5', '-1', { 'DB': 'casket2.kct', 'orig': '1' })
@@ -437,7 +435,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
     # not exist database name.
     try:
-      self._client.call('increment', 'inc6', { 'DB': 'xxxxx' })
+      self._client.call('increment', 'inc6', '1', { 'DB': 'xxxxx' })
     except error.RPCError as e:
       self.assertEqual(e.args[0], 34)
 
@@ -445,7 +443,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     ret6 = self._client.call('increment', 'inc7', '11', { 'xt': '10000' })
     self.assertEqual(ret6, { u'num': u'11' })
     ret6 = self._client.call('get', 'inc7')
-    self.assertEqual(ret6.get('value'), u'11')
+    self.assertEqual(ret6.get('value'), u'')
     self.assertTrue(ret6.has_key('xt'))
 
 
