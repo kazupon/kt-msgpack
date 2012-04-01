@@ -48,6 +48,7 @@ Configure and install in the usual way:
         void remove(1:string key, 2:optional map<string, string> inmap)
         void append(1:string key, 2:string value, 3:optional map<string, string> inmap)
         map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
+        void clear(1:optional map<string, string> inmap)
     }
 
 
@@ -108,7 +109,9 @@ returns the map data that contains the following keys.
 - (optional): arbitrary records for other information.
 
 #### error
-none.
+the following error codes returned in the response.
+
+- 34: not exist a database.
 
 
 ### add
@@ -270,6 +273,24 @@ the following error codes returned in the response.
 - 35: no record was found.
 - 36: invalid parameters.
 
+
+### clear
+    void clear(1:optional map<string, string> inmap)
+
+Remove all records in a database.
+
+#### parameters
+specify the following keys in `inmap`.
+
+- DB: the database identifier. (optional)
+
+#### return
+none.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
 
 
 ## Error codes
