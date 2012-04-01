@@ -39,14 +39,14 @@ Configure and install in the usual way:
 
     service KyotoTycoonService {
         void ping()
-        map<bytes, bytes> echo(1:optional map<bytes, bytes> inmap)
-        map<bytes, bytes> report()
-        map<bytes, bytes> status(1:optional map<bytes, bytes> inmap)
-        void add(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
-        void set(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
-        map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
-        void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
-        void append(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+        map<string, string> echo(1:optional map<string, string> inmap)
+        map<string, string> report()
+        map<string, string> status(1:optional map<string, string> inmap)
+        void add(1:string key, 2:string value, 3:optional map<string, string> inmap)
+        void set(1:string key, 2:string value, 3:optional map<string, string> inmap)
+        map<string, string> get(1:string key, 2:optional map<string, string> inmap)
+        void remove(1:string key, 2:optional map<string, string> inmap)
+        void append(1:string key, 2:string value, 3:optional map<string, string> inmap)
         map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
     }
 
@@ -65,7 +65,7 @@ none.
 
 
 ### echo
-    map<bytes, bytes> echo(1:optional map<bytes, bytes> inmap)
+    map<string, string> echo(1:optional map<string, string> inmap)
 
 Echo back the input data as the output data, just for testing.
 
@@ -79,7 +79,7 @@ corresponding parameters to the input data.
 
 
 ### report
-    map<bytes, bytes> report()
+    map<string, string> report()
 
 Get the report of the database server information.
 
@@ -91,7 +91,7 @@ report of the database server information.
 
 
 ### status
-    map<bytes, bytes> status(1:optional map<bytes, bytes> inmap)
+    map<string, string> status(1:optional map<string, string> inmap)
 
 Get the miscellaneous status information of a database.
 
@@ -112,7 +112,7 @@ none.
 
 
 ### add
-    void add(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+    void add(1:string key, 2:string value, 3:optional map<string, string> inmap)
 
 Add a record.
 
@@ -139,7 +139,7 @@ the following error codes returned in the response.
 
 
 ### set
-    void set(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+    void set(1:string key, 2:string value, 3:optional map<string, string> inmap)
 
 Set the value of a record.
 
@@ -165,7 +165,7 @@ the following error codes returned in the response.
 
 
 ### get
-    map<bytes, bytes> get(1:bytes key, 2:optional map<bytes, bytes> inmap)
+    map<string, string> get(1:string key, 2:optional map<string, string> inmap)
 
 Retrieve the value of a record.
 
@@ -193,7 +193,7 @@ the following error codes returned in the response.
 
 
 ### remove
-    void remove(1:bytes key, 2:optional map<bytes, bytes> inmap)
+    void remove(1:string key, 2:optional map<string, string> inmap)
 
 Remove a record.
 
@@ -218,7 +218,7 @@ the following error codes returned in the response.
 
 
 ### append
-    void append(1:bytes key, 2:bytes value, 3:optional map<bytes, bytes> inmap)
+    void append(1:string key, 2:string value, 3:optional map<string, string> inmap)
 
 Append the value of a record.
 
