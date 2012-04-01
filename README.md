@@ -50,6 +50,7 @@ Configure and install in the usual way:
         map<string, string> seize(1:string key, 2:optional map<string, string> inmap)
         void clear(1:optional map<string, string> inmap)
         void replace(1:string key, 2:string value, 3:optional map<string, string> inmap)
+        void cas(1:string key, 3:optional map<string, string> inmap)
     }
 
 
@@ -320,6 +321,33 @@ the following error codes returned in the response.
 - 36: invalid parameters.
 
 
+### cas
+    void cas(1:string key, 3:optional map<string, string> inmap)
+
+Perform compare-and-swap.
+
+#### parameters
+specify the following parameters.
+
+- key: the key of the record. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- oval: the old value. If it is omittted, no record is meant. (optional)
+- nval: the new value. If it is omittted, the record is removed. (optional)
+- DB: the database identifier. (optional)
+- xt: the expiration time from now in seconds. If it is negative, the absolute value is treated as the epoch time. If it is omitted, no expiration time is specified. (optional)
+
+#### return
+none.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 36: invalid parameters.
+- 37: the old value assumption was failed.
+
 
 ## Error codes
 
@@ -328,6 +356,7 @@ the following error codes returned in the response.
 - 34: no exist a database.
 - 35: no record was found.
 - 36: invalid parameters.
+- 37: the old value assumption was failed.
 
 
 
