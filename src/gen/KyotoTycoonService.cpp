@@ -121,6 +121,12 @@ static void dispatch_remove_bulk(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->remove_bulk(*preq, message);
 }
+static void dispatch_get_bulk(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::get_bulk message;
+	preq->params().convert(&message);
+	svr->get_bulk(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -148,6 +154,7 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("match_regex", &dispatch_match_regex));
 	table->insert(std::make_pair("set_bulk", &dispatch_set_bulk));
 	table->insert(std::make_pair("remove_bulk", &dispatch_remove_bulk));
+	table->insert(std::make_pair("get_bulk", &dispatch_get_bulk));
 	TABLE = (void*)table.release();
 }
 

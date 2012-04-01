@@ -822,6 +822,63 @@ private:
     }
   }
 
+  void get_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::get_bulk& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " get_bulk");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    const char* atomic_ptr = kt::strmapget(params.inmap, "atomic");
+    bool atomic = atomic_ptr ? true : false;
+                    
+    std::vector<std::string> keys;
+    keys.reserve(params.inmap.size());
+    map_t::const_iterator it = params.inmap.begin();
+    map_t::const_iterator itend = params.inmap.end();
+    while (it != itend) {
+      const char* kbuf = it->first.data();
+      size_t ksiz = it->first.size();
+      if (ksiz > 0 && *kbuf == '_') {
+        std::string key(kbuf + 1, ksiz - 1);
+        keys.push_back(key);
+      }
+      ++it;
+    }
+
+    map_t records;
+    int64_t num = db->get_bulk(keys, &records, atomic);
+    if (num >= 0) {
+      map_t outmap;
+      insert_to_map(outmap, "num", "%lld", (long long)num);
+      map_t::iterator it = records.begin();
+      map_t::iterator itend = records.end();
+      while (it != itend) {
+        std::string key("_");
+        key.append(it->first);
+        outmap[key] = it->second;
+        ++it;
+      }
+      req.result(outmap);
+    } else {
+      const kc::BasicDB::Error& e = db->error();
+      if (e) {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " get_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+  }
+
 private:
   kt::TimedDB* get_db() {
     return &m_dbary[0];
