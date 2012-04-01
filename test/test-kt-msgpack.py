@@ -334,7 +334,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self._client.call('append', 'replace2', '1', { 'DB': 'casket2.kct' })
     self._client.call('replace', 'replace2', '2', { 'DB': 'casket2.kct' })
     ret2 = self._client.call('get', 'replace2', { 'DB': 'casket2.kct' })
-    self.assertIsNone(ret2, { u'value': u'2' })
+    self.assertEqual(ret2, { u'value': u'2' })
 
     # not exist database name.
     try:

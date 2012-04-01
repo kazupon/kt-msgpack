@@ -460,6 +460,38 @@ private:
 
     req.result();
   }
+  
+  void replace(msgpack::rpc::request::type<void> req, KyotoTycoonService::replace& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " replace");
+
+    kt::TimedDB* db = NULL;
+    uint32_t db_name_size;
+    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    uint32_t s_xt_size;
+    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
+    if (!db->replace(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
+      const kc::BasicDB::Error& e = db->error();
+      if (e) {
+        log(m_logger, Logger::ERROR, LOG_PREFIX " replace procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        req.error(ERR_UNEXPECTED_ERROR);
+        return;
+      }
+    }
+
+    req.result();
+  }
+
   /*
 	void replace(msgpack::rpc::request::type<bool> req, KyotoTyrantService::replace& params) {
 		bool success = get_db()->replace(params.key.ptr, params.key.size,

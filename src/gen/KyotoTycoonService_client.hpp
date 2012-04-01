@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_85246eec_HPP__
-#define MPRPC_KyotoTycoonService_client_85246eec_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_e1baee5c_HPP__
+#define MPRPC_KyotoTycoonService_client_e1baee5c_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -283,6 +283,33 @@ public:
 		KyotoTycoonService::clear _Message;
 		_Message.inmap = inmap;
 		return clear_async_apply(_Message);
+	}
+	void replace_apply(
+			const KyotoTycoonService::replace& message) {
+		instance.call_apply("replace", message).get<void>();
+	}
+
+	void replace(
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::replace _Message;
+		_Message.key = key;
+		_Message.value = value;
+		_Message.inmap = inmap;
+		return replace_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> replace_async_apply(
+			const KyotoTycoonService::replace& message) {
+		return instance.call_apply("replace", message);
+	}
+
+	msgpack::rpc::future::type<void> replace_async(
+			const std::string& key, const std::string& value, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::replace _Message;
+		_Message.key = key;
+		_Message.value = value;
+		_Message.inmap = inmap;
+		return replace_async_apply(_Message);
 	}
 };
 
