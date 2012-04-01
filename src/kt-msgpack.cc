@@ -212,8 +212,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " status");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -239,8 +239,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " add");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -251,8 +251,7 @@ private:
       return;
     }
 
-    uint32_t s_xt_size;
-    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
     if (db->add(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       req.result();
@@ -271,8 +270,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " set");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -283,8 +282,7 @@ private:
       return;
     }
 
-    uint32_t s_xt_size;
-    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
     if (!db->set(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
@@ -301,8 +299,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " get");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -340,8 +338,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " remove");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -370,8 +368,8 @@ private:
 		log(m_logger, Logger::INFO, LOG_PREFIX " append");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -382,8 +380,7 @@ private:
       return;
     }
 
-    uint32_t s_xt_size;
-    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
     if (!db->append(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
@@ -401,8 +398,8 @@ private:
     log(m_logger, Logger::INFO, LOG_PREFIX " seize");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -440,8 +437,8 @@ private:
     log(m_logger, Logger::INFO, LOG_PREFIX " clear");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -466,8 +463,8 @@ private:
     log(m_logger, Logger::INFO, LOG_PREFIX " replace");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -478,8 +475,7 @@ private:
       return;
     }
 
-    uint32_t s_xt_size;
-    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
     if (!db->replace(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
@@ -497,8 +493,8 @@ private:
     log(m_logger, Logger::INFO, LOG_PREFIX " cas");
 
     kt::TimedDB* db = NULL;
-    uint32_t db_name_size;
-    const char* db_name = get_c_str_from_map(params.inmap, "DB", &db_name_size);
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
     if (db_name != NULL) {
       db = get_db(std::string(db_name, db_name_size));
     } else {
@@ -513,8 +509,7 @@ private:
     const char* ovbuf = kt::strmapget(params.inmap, "oval", &ovsiz);
     size_t nvsiz;
     const char* nvbuf = kt::strmapget(params.inmap, "nval", &nvsiz);
-    uint32_t s_xt_size;
-    const char* s_xt = get_c_str_from_map(params.inmap, "xt", &s_xt_size);
+    const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
     if (!db->cas(params.key.c_str(), params.key.size(), ovbuf, ovsiz, nvbuf, nvsiz, xt)) {
       const kc::BasicDB::Error& e = db->error();
@@ -532,14 +527,6 @@ private:
   }
 
   /*
-	void cas(msgpack::rpc::request::type<bool> req, KyotoTyrantService::cas& params) {
-		bool success = get_db()->cas(params.key.ptr, params.key.size,
-				params.ovalue.ptr, params.ovalue.size,
-				params.nvalue.ptr, params.nvalue.size,
-				params.xt);
-		req.result(success);
-	}
-
 	void match_prefix(msgpack::rpc::request::type<std::vector<msgpack::type::raw_ref> > req, KyotoTyrantService::match_prefix& params) {
 		std::vector<std::string>* strvec = req.zone()->allocate<std::vector<std::string> >();
 		std::string prefix(params.prefix.ptr, params.prefix.size);
