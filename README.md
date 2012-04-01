@@ -53,6 +53,7 @@ Configure and install in the usual way:
         void cas(1:string key, 3:optional map<string, string> inmap)
         map<string, string> increment(1:string key, 2:string num, 3:optional map<string, string> inmap)
         map<string, string> increment_double(1:string key, 2:string num, 3:optional map<string, string> inmap)
+        map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap)
     }
 
 
@@ -409,6 +410,34 @@ the following error codes returned in the response.
 - 34: not exist a database.
 - 36: invalid parameters.
 - 38: existing record was not compatible.
+
+
+### match_prefix
+    map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap)
+
+Get keys matching a prefix string.
+
+#### parameters
+specify the following parameters.
+
+- prefix: the prefix string. (optional)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- max: the maximum number to retrieve. If it is omitted or negative, no limit is specified.
+- DB: the database identifier. (optional)
+
+#### return
+returns the map data that contains the following keys.
+
+- num: the number of retrieved keys.
+- (optional): arbitrary keys.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 36: invalid parameters.
 
 
 
