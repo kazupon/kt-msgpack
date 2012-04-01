@@ -295,6 +295,33 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     except error.RPCError as e:
       self.assertEqual(e.args[0], 2)
 
+  def test_clear(self):
+    # normal
+    self._client.call('set', 'clear1', '1')
+    self._client.call('set', 'clear2', '1')
+    ret1 = self._client.call('clear')
+    self.assertIsNone(ret1)
+    try:
+      self._client.call('get', 'clear1')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # specific database name.
+    self._client.call('set', 'clear1', '1', { 'DB': 'casket2.kct' })
+    self._client.call('set', 'clear2', '1', { 'DB': 'casket2.kct' })
+    ret2 = self._client.call('clear')
+    self.assertIsNone(ret2)
+    try:
+      self._client.call('get', 'clear2', { 'DB': 'casket2.kct' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 35)
+
+    # not exist database name.
+    try:
+      self._client.call('clear', { 'DB': 'xxxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
 
 if __name__ == '__main__':
   unittest.main()
