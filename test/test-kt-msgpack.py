@@ -716,6 +716,35 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self._client.call('set_bulk', inmap)
     ret3 = self._client.call('vacuum', { 'step': '1' })
     self.assertIsNone(ret3)
+
+  def test_synchronize(self):
+    # normal
+    ret1 = self._client.call('synchronize', { 'command': 'dbbackup' })
+    self.assertIsNone(ret1)
+
+    # noting command
+    try:
+      self._client.call('synchronize', { 'command': 'xxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 40)
+
+    # specific database name
+    ret2 = self._client.call('synchronize', { 'DB': 'casket2.kct', 'command': 'dbbackup' })
+    self.assertIsNone(ret2)
+
+    # not exist database name.
+    try:
+      self._client.call('synchronize', { 'DB': 'xxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
     
+    # specific hard
+    ret3 = self._client.call('synchronize', { 'hard': 'True', 'command': 'dbbackup' })
+    self.assertIsNone(ret3)
+
+    # specific no parameter.
+    self._client.call('synchronize')
+
+
 if __name__ == '__main__':
   unittest.main()
