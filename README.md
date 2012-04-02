@@ -58,7 +58,6 @@ Configure and install in the usual way:
         map<string, string> set_bulk(1:optional map<string, string> inmap)
         map<string, string> remove_bulk(1:optional map<string, string> inmap)
         map<string, string> get_bulk(1:optional map<string, string> inmap)
-        void cur_jump(1:string CUR, 2:optional map<string, string> inmap)
     }
 
 
@@ -544,31 +543,6 @@ the following error codes returned in the response.
 - 34: not exist a database.
 
 
-### cur_jump
-    void cur_jump(1:string CUR, 2:optional map<string, string> inmap)
-
-Jump the cursor to the first record for forward scan.
-
-#### parameters
-specify the following parameters.
-
-- CUR: the cursor identifier. (required)
-
-also, if necessary, specify the following keys in `inmap` parameter.
-
-- DB: the database identifier. (optional)
-- key: the key of the destination record. If it is omitted, the first record is specified. (optional)
-
-#### return
-none.
-
-#### error
-the following error codes returned in the response.
-
-- 34: no exist a database.
-- 39: invalid cursor.
-
-
 
 ## Error codes
 
@@ -580,6 +554,8 @@ the following error codes returned in the response.
 - 37: old value assumption was failed.
 - 38: existing record was not compatible.
 - 39: invalid cursor.
+- 40: failed postprocessing command.
+- 41: arbitrary logical error.
 
 
 
