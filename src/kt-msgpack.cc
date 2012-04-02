@@ -64,6 +64,7 @@ public:
     log(m_logger, Logger::DEBUG, LOG_PREFIX " thread=%d", m_cfg.thread);
     log(m_logger, Logger::DEBUG, LOG_PREFIX " mhost=%s", m_cfg.master_host.c_str());
     log(m_logger, Logger::DEBUG, LOG_PREFIX " mport=%d", m_cfg.master_port);
+    log(m_logger, Logger::DEBUG, LOG_PREFIX " cmd=%s", m_cfg.cmd.c_str());
 
     for (int32_t i = 0; i < m_dbnum; i++) {
       std::string path = m_dbary[i].path();
@@ -107,7 +108,8 @@ private:
       port(0),
       thread(8),
       master_host("127.0.0.1"),
-      master_port(kt::DEFPORT) {
+      master_port(kt::DEFPORT),
+      cmd("./") {
     }
 
   private:
@@ -123,6 +125,8 @@ private:
         master_host = value;
       } else if (key == "mport") {
         master_host = kc::atoi(value.c_str());
+      } else if (key == "cmd") {
+        cmd = value;
       } else {
         log(logger, Logger::SYSTEM,
             LOG_PREFIX "unknown option: %s", key.c_str());
@@ -150,6 +154,7 @@ private:
     uint16_t thread;
     std::string master_host;
     uint16_t master_port;
+    std::string cmd;
   private:
     Logger* m_logger;
 	};
@@ -906,6 +911,84 @@ private:
       const kc::BasicDB::Error& e = db->error();
       log(m_logger, Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
+      return;
+    }
+
+    req.result();
+  }
+
+  void synchronize(msgpack::rpc::request::type<void> req, KyotoTycoonService::synchronize& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " synchronize");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    const char* hard_ptr = kt::strmapget(params.inmap, "hard");
+    bool hard = hard_ptr ? true : false;
+
+    size_t cmd_size;
+    const char* cmd_ptr = kt::strmapget(params.inmap, "command", &cmd_size);
+    std::string cmd("");
+    if (cmd_ptr != NULL) {
+      cmd = std::string(cmd_ptr, cmd_size);
+    }
+
+    class Visitor : public kc::BasicDB::FileProcessor {
+      public:
+        Visitor(Logger* logger, std::string& command_path, const std::string& command) :
+          logger_(logger), command_path_(command_path), command_(command) { }
+      private:
+        bool process(const std::string& path, int64_t count, int64_t size) {
+          if (command_.size() < 1) {
+            return true;
+          }
+          const char* cmd = command_.c_str();
+          if (std::strchr(cmd, kc::File::PATHCHR) || !std::strcmp(cmd, kc::File::CDIRSTR) ||
+              !std::strcmp(cmd, kc::File::PDIRSTR)) {
+            log(logger_, Logger::ERROR, LOG_PREFIX "  synchronize invalid command name: %s", cmd);
+            return false;
+          }
+          std::string cmdpath;
+          kc::strprintf(&cmdpath, "%s%c%s", command_path_.c_str(), kc::File::PATHCHR, cmd);
+          std::vector<std::string> args;
+          args.push_back(cmdpath);
+          args.push_back(path);
+          std::string tsstr;
+          uint64_t cc = kt::UpdateLogger::clock_pure();
+          kc::strprintf(&tsstr, "%020llu", (unsigned long long)cc);
+          args.push_back(tsstr);
+          log(logger_, Logger::SYSTEM, LOG_PREFIX "  synchronize executing: %s \"%s\"", cmd, path.c_str());
+          if (kt::executecommand(args) != 0) {
+            log(logger_, Logger::ERROR, LOG_PREFIX "  synchronize execution failed: %s \"%s\"", cmd, path.c_str());
+            return false;
+          }
+          return true;
+        }
+        Logger* logger_; 
+        std::string command_path_;
+        std::string command_;
+    };
+    Visitor visitor(m_logger, m_cfg.cmd, cmd);
+
+    if (!db->synchronize(hard, &visitor)) {
+      const kc::BasicDB::Error& e = db->error();
+      log(m_logger, Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      if (e == kc::BasicDB::Error::LOGIC) {
+        req.error(ERR_FAILED_POST_PROCESSING_COMMAND);
+      } else {
+        req.error(ERR_UNEXPECTED_ERROR);
+      }
+      return;
     }
 
     req.result();
