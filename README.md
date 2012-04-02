@@ -58,6 +58,7 @@ Configure and install in the usual way:
         map<string, string> set_bulk(1:optional map<string, string> inmap)
         map<string, string> remove_bulk(1:optional map<string, string> inmap)
         map<string, string> get_bulk(1:optional map<string, string> inmap)
+        void vacuum (1:optional map<string, string> inmap)
     }
 
 
@@ -536,6 +537,26 @@ returns the map data that contains the following keys.
 
 - num: the number of removed reocrds.
 - \_xxx: arbitrary records whose keys trail the character "\_". (optional)
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+
+
+### vacuum
+    void vacuum (1:optional map<string, string> inmap)
+
+Scan the database and eliminate regions of expired records.
+
+#### parameters
+specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+- step: the number of steps. If it is omitted or not more than 0, the whole region is scanned. (optional)
+
+#### return
+none.
 
 #### error
 the following error codes returned in the response.
