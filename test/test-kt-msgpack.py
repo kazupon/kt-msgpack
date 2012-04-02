@@ -686,7 +686,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(len(ret4), 1) # 'num' key only
 
   def test_vacuum(self):
-    num = 100
+    num = 10000
     base = 'vacuum'
 
     # normal

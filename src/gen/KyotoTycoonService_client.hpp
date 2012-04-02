@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_f9109899_HPP__
-#define MPRPC_KyotoTycoonService_client_f9109899_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_4f89f33c_HPP__
+#define MPRPC_KyotoTycoonService_client_4f89f33c_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -508,6 +508,29 @@ public:
 		KyotoTycoonService::get_bulk _Message;
 		_Message.inmap = inmap;
 		return get_bulk_async_apply(_Message);
+	}
+	void vacuum_apply(
+			const KyotoTycoonService::vacuum& message) {
+		instance.call_apply("vacuum", message).get<void>();
+	}
+
+	void vacuum(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::vacuum _Message;
+		_Message.inmap = inmap;
+		return vacuum_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> vacuum_async_apply(
+			const KyotoTycoonService::vacuum& message) {
+		return instance.call_apply("vacuum", message);
+	}
+
+	msgpack::rpc::future::type<void> vacuum_async(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::vacuum _Message;
+		_Message.inmap = inmap;
+		return vacuum_async_apply(_Message);
 	}
 };
 

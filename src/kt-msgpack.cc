@@ -883,6 +883,34 @@ private:
     }
   }
 
+  void vacuum(msgpack::rpc::request::type<void> req, KyotoTycoonService::vacuum& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " vacuum");
+
+    kt::TimedDB* db = NULL;
+    size_t db_name_size;
+    const char* db_name = kt::strmapget(params.inmap, "DB", &db_name_size);
+    if (db_name != NULL) {
+      db = get_db(std::string(db_name, db_name_size));
+    } else {
+      db = get_db();
+    }
+    if (db == NULL) {
+      req.error(ERR_NOT_FOUND_DATABASE);
+      return;
+    }
+
+    const char* step_ptr = kt::strmapget(params.inmap, "step");
+    int64_t step = step_ptr ? kc::atoi(step_ptr) : 0;
+                    
+    if (!db->vacuum(step)) {
+      const kc::BasicDB::Error& e = db->error();
+      log(m_logger, Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      req.error(ERR_UNEXPECTED_ERROR);
+    }
+
+    req.result();
+  }
+
 private:
   kt::TimedDB* get_db() {
     return &m_dbary[0];

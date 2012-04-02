@@ -23,4 +23,5 @@ service KyotoTycoonService {
     map<string, string> set_bulk(1:optional map<string, string> inmap = "") // HACK: map optional generating
     map<string, string> remove_bulk(1:optional map<string, string> inmap = "") // HACK: map optional generating
     map<string, string> get_bulk(1:optional map<string, string> inmap = "") // HACK: map optional generating
+    void vacuum(1:optional map<string, string> inmap = "") // HACK: map optional generating
 }
