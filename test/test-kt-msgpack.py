@@ -685,6 +685,37 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self.assertEqual(ret4['num'], u'0')
     self.assertEqual(len(ret4), 1) # 'num' key only
 
+  def test_vacuum(self):
+    num = 100
+    base = 'vacuum'
 
+    # normal
+    inmap = self.create_inmap(base, num)
+    inmap['xt'] = '1'
+    self._client.call('set_bulk', inmap)
+    ret1 = self._client.call('vacuum')
+    self.assertIsNone(ret1)
+
+    # specific database name.
+    inmap = self.create_inmap(base, num)
+    inmap['DB'] = 'casket2.kct'
+    inmap['xt'] = '1'
+    self._client.call('set_bulk', inmap)
+    ret2 = self._client.call('vacuum', { 'DB': 'casket2.kct' })
+    self.assertIsNone(ret2)
+
+    # not exist database name.
+    try:
+      self._client.call('vacuum', { 'DB': 'xxxx' })
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 34)
+
+    # specific step
+    inmap = self.create_inmap(base, num)
+    inmap['xt'] = '1'
+    self._client.call('set_bulk', inmap)
+    ret3 = self._client.call('vacuum', { 'step': '1' })
+    self.assertIsNone(ret3)
+    
 if __name__ == '__main__':
   unittest.main()
