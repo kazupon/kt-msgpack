@@ -556,6 +556,7 @@ the following error codes returned in the response.
 - 39: invalid cursor.
 - 40: failed postprocessing command.
 - 41: arbitrary logical error.
+- 42: not implemented.
 
 
 
