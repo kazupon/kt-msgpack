@@ -59,6 +59,7 @@ Configure and install in the usual way:
         map<string, string> remove_bulk(1:optional map<string, string> inmap)
         map<string, string> get_bulk(1:optional map<string, string> inmap)
         void vacuum (1:optional map<string, string> inmap)
+        void synchronize (1:optional map<string, string> inmap)
     }
 
 
@@ -562,6 +563,28 @@ none.
 the following error codes returned in the response.
 
 - 34: not exist a database.
+
+
+### synchronize
+    void synchronize (1:optional map<string, string> inmap)
+
+Synchronize updated contents with the file and the device.
+
+#### parameters
+specify the following keys in `inmap` parameter.
+
+- DB: the database identifier. (optional)
+- hard: for physical synchronization with the device. (optional)
+- command: the command name to process the database file. (optional)
+
+#### return
+none.
+
+#### error
+the following error codes returned in the response.
+
+- 34: not exist a database.
+- 40: failed postprocessing command.
 
 
 
