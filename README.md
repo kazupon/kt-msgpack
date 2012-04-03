@@ -60,6 +60,7 @@ Configure and install in the usual way:
         map<string, string> get_bulk(1:optional map<string, string> inmap)
         void vacuum (1:optional map<string, string> inmap)
         void synchronize (1:optional map<string, string> inmap)
+        map<string, string> play_script(1:string name, 2:optional map<string, string> inmap);
     }
 
 
@@ -388,7 +389,7 @@ the following error codes returned in the response.
 - 38: existing record was not compatible.
 
 
-### increment_double
+### increment\_double
     map<string, string> increment_double(1:string key, 2:string num, 3:optional map<string, string> inmap)
 
 Add a number to the numeric double value of a record.
@@ -418,7 +419,7 @@ the following error codes returned in the response.
 - 38: existing record was not compatible.
 
 
-### match_prefix
+### match\_prefix
     map<string, string> match_prefix(1:string prefix, 2:optional map<string, string> inmap)
 
 Get keys matching a prefix string.
@@ -446,7 +447,7 @@ the following error codes returned in the response.
 - 36: invalid parameters.
 
 
-### match_regex
+### match\_regex
     map<string, string> match_regex(1:string regexp, 2:optional map<string, string> inmap)
 
 Get keys matching a ragular expression string.
@@ -465,7 +466,7 @@ also, if necessary, specify the following keys in `inmap` parameter.
 returns the map data that contains the following keys.
 
 - num: the number of retrieved keys.
-- _xxxx(optional): arbitrary keys which trail the character "_".
+- \_xxxx(optional): arbitrary keys which trail the character "\_".
 
 #### error
 the following error codes returned in the response.
@@ -474,7 +475,7 @@ the following error codes returned in the response.
 - 36: invalid parameters.
 
 
-### set_bulk
+### set\_bulk
     map<string, string> set_bulk(1:optional map<string, string> inmap)
 
 Store records at once.
@@ -498,7 +499,7 @@ the following error codes returned in the response.
 - 34: not exist a database.
 
 
-### remove_bulk
+### remove\_bulk
     map<string, string> remove_bulk(1:optional map<string, string> inmap)
 
 Remove records at once.
@@ -521,7 +522,7 @@ the following error codes returned in the response.
 - 34: not exist a database.
 
 
-### get_bulk
+### get\_bulk
     map<string, string> get_bulk(1:optional map<string, string> inmap)
 
 Retrieve records at once.
@@ -585,6 +586,31 @@ the following error codes returned in the response.
 
 - 34: not exist a database.
 - 40: failed postprocessing command.
+
+
+### play\_script
+    map<string, string> play_script(1:string name, 2:optional map<string, string> inmap);
+
+Call a procedure of the script language extension.
+
+#### parameters
+specify the following parameters.
+
+- name: the name of the procedure to call. (required)
+
+also, if necessary, specify the following keys in `inmap` parameter.
+
+- \_xxx: arbitrary key/value pairs whose keys trail the character "\_". (optional)
+
+#### return
+returns the map data that contains the following keys.
+
+- \_xxx: arbitrary key/value pairs which keys trail the character "\_". (optional)
+
+#### error
+the following error codes returned in the response.
+
+- 41: arbitrary logical error.
 
 
 
