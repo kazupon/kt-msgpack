@@ -588,7 +588,7 @@ the following error codes returned in the response.
 - 40: failed postprocessing command.
 
 
-### play\_script
+### play\_script (not implemented)
     map<string, string> play_script(1:string name, 2:optional map<string, string> inmap);
 
 Call a procedure of the script language extension.
