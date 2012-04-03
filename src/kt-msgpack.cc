@@ -335,7 +335,7 @@ private:
         req.error(ERR_UNEXPECTED_ERROR);
       }
 		} else {
-      log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
+      //log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
       map_t outmap;
       insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
@@ -434,7 +434,7 @@ private:
         req.error(ERR_UNEXPECTED_ERROR);
       }
 		} else {
-      log(m_logger, Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
+      //log(m_logger, Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
       map_t outmap;
       insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
@@ -569,13 +569,13 @@ private:
     } else {
       orig = 0;
     }
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: orig = %lld", (long long)orig);
+    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: orig = %lld", (long long)orig);
 
     const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
 
     num = db->increment(params.key.c_str(), params.key.size(), num, orig, xt);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: num = %lld", (long long)num);
+    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: num = %lld", (long long)num);
     if (num != kc::INT64MIN) {
       map_t outmap;
       insert_to_map(outmap, "num", "%lld", (long long)num);
@@ -624,13 +624,13 @@ private:
     } else {
       orig = 0;
     }
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: orig = %f", orig);
+    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: orig = %f", orig);
 
     const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
 
     num = db->increment_double(params.key.c_str(), params.key.size(), num, orig, xt);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: num = %f", num);
+    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: num = %f", num);
     if (!kc::chknan(num)) {
       map_t outmap;
       insert_to_map(outmap, "num", "%f", num);
