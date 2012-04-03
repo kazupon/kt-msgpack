@@ -747,7 +747,7 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
 
   def test_play_script(self):
     try:
-      self._client.call('play_script')
+      self._client.call('play_script', 'echo')
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
@@ -780,68 +780,79 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self.assertEqual(e.args[0], 42)
 
   def test_cur_jump(self):
+    CUR = '1'
     try:
-      self._client.call('cur_jump')
+      self._client.call('cur_jump', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_jump_back(self):
+    CUR = '1'
     try:
-      self._client.call('cur_jump_back')
+      self._client.call('cur_jump_back', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_step(self):
+    CUR = '1'
     try:
-      self._client.call('cur_step')
+      self._client.call('cur_step', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_step_back(self):
+    CUR = '1'
     try:
-      self._client.call('cur_step_back')
+      self._client.call('cur_step_back', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_set_value(self):
+    CUR = '1'
     try:
-      self._client.call('cur_set_value')
+      self._client.call('cur_set_value', CUR, 'value1')
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_remove(self):
+    CUR = '1'
     try:
-      self._client.call('cur_remove')
+      self._client.call('cur_remove', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_get_key(self):
+    CUR = '1'
     try:
-      self._client.call('cur_get_key')
+      self._client.call('cur_get_key', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_get_value(self):
+    CUR = '1'
     try:
-      self._client.call('cur_get_value')
+      self._client.call('cur_get_value', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_get(self):
+    CUR = '1'
     try:
-      self._client.call('cur_get')
+      self._client.call('cur_get', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
   
   def test_cur_seize(self):
+    CUR = '1'
     try:
-      self._client.call('cur_seize')
+      self._client.call('cur_seize', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 
   def test_cur_delete(self):
+    CUR = '1'
     try:
-      self._client.call('cur_delete')
+      self._client.call('cur_delete', CUR)
     except error.RPCError as e:
       self.assertEqual(e.args[0], 42)
 

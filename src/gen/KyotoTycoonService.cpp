@@ -139,6 +139,84 @@ static void dispatch_synchronize(server* svr, msgpack::rpc::request* preq)
 	preq->params().convert(&message);
 	svr->synchronize(*preq, message);
 }
+static void dispatch_play_script(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::play_script message;
+	preq->params().convert(&message);
+	svr->play_script(*preq, message);
+}
+static void dispatch_tune_replication(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::tune_replication message;
+	preq->params().convert(&message);
+	svr->tune_replication(*preq, message);
+}
+static void dispatch_cur_jump(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_jump message;
+	preq->params().convert(&message);
+	svr->cur_jump(*preq, message);
+}
+static void dispatch_cur_jump_back(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_jump_back message;
+	preq->params().convert(&message);
+	svr->cur_jump_back(*preq, message);
+}
+static void dispatch_cur_step(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_step message;
+	preq->params().convert(&message);
+	svr->cur_step(*preq, message);
+}
+static void dispatch_cur_step_back(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_step_back message;
+	preq->params().convert(&message);
+	svr->cur_step_back(*preq, message);
+}
+static void dispatch_cur_set_value(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_set_value message;
+	preq->params().convert(&message);
+	svr->cur_set_value(*preq, message);
+}
+static void dispatch_cur_remove(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_remove message;
+	preq->params().convert(&message);
+	svr->cur_remove(*preq, message);
+}
+static void dispatch_cur_get_key(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_get_key message;
+	preq->params().convert(&message);
+	svr->cur_get_key(*preq, message);
+}
+static void dispatch_cur_get_value(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_get_value message;
+	preq->params().convert(&message);
+	svr->cur_get_value(*preq, message);
+}
+static void dispatch_cur_get(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_get message;
+	preq->params().convert(&message);
+	svr->cur_get(*preq, message);
+}
+static void dispatch_cur_seize(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_seize message;
+	preq->params().convert(&message);
+	svr->cur_seize(*preq, message);
+}
+static void dispatch_cur_delete(server* svr, msgpack::rpc::request* preq)
+{
+	KyotoTycoonService::cur_delete message;
+	preq->params().convert(&message);
+	svr->cur_delete(*preq, message);
+}
 
 typedef mp::unordered_map<std::string, void (*)(server*, msgpack::rpc::request*)> table_type;
 #define TABLE server::s_dispatch_table.pimpl
@@ -169,6 +247,19 @@ server::dispatch_table::dispatch_table()
 	table->insert(std::make_pair("get_bulk", &dispatch_get_bulk));
 	table->insert(std::make_pair("vacuum", &dispatch_vacuum));
 	table->insert(std::make_pair("synchronize", &dispatch_synchronize));
+	table->insert(std::make_pair("play_script", &dispatch_play_script));
+	table->insert(std::make_pair("tune_replication", &dispatch_tune_replication));
+	table->insert(std::make_pair("cur_jump", &dispatch_cur_jump));
+	table->insert(std::make_pair("cur_jump_back", &dispatch_cur_jump_back));
+	table->insert(std::make_pair("cur_step", &dispatch_cur_step));
+	table->insert(std::make_pair("cur_step_back", &dispatch_cur_step_back));
+	table->insert(std::make_pair("cur_set_value", &dispatch_cur_set_value));
+	table->insert(std::make_pair("cur_remove", &dispatch_cur_remove));
+	table->insert(std::make_pair("cur_get_key", &dispatch_cur_get_key));
+	table->insert(std::make_pair("cur_get_value", &dispatch_cur_get_value));
+	table->insert(std::make_pair("cur_get", &dispatch_cur_get));
+	table->insert(std::make_pair("cur_seize", &dispatch_cur_seize));
+	table->insert(std::make_pair("cur_delete", &dispatch_cur_delete));
 	TABLE = (void*)table.release();
 }
 

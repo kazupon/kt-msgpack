@@ -994,6 +994,71 @@ private:
     req.result();
   }
 
+  void play_script(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::play_script& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " play_script");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void tune_replication(msgpack::rpc::request::type<void> req, KyotoTycoonService::tune_replication& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " tune_replication");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_jump(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_jump");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_jump_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump_back& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_jump_back");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_step(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_step");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_step_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step_back& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_step_back");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_set_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_set_value& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_set_value");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_remove& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_remove");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_get_key(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_key& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get_key");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_get_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_value& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get_value");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_get(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_seize(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_seize& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_seize");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
+  void cur_delete(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_delete& params) {
+    log(m_logger, Logger::INFO, LOG_PREFIX " cur_delete");
+    req.error(ERR_NOT_IMPLEMENTED);
+  }
+
 private:
   kt::TimedDB* get_db() {
     return &m_dbary[0];

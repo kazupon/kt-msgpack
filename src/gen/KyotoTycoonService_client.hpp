@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_96a04bff_HPP__
-#define MPRPC_KyotoTycoonService_client_96a04bff_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_f8a090eb_HPP__
+#define MPRPC_KyotoTycoonService_client_f8a090eb_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -554,6 +554,323 @@ public:
 		KyotoTycoonService::synchronize _Message;
 		_Message.inmap = inmap;
 		return synchronize_async_apply(_Message);
+	}
+	std::map<std::string,std::string>  play_script_apply(
+			const KyotoTycoonService::play_script& message) {
+		return instance.call_apply("play_script", message).get<std::map<std::string,std::string> >();
+	}
+
+	std::map<std::string,std::string>  play_script(
+			const std::string& name, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::play_script _Message;
+		_Message.name = name;
+		_Message.inmap = inmap;
+		return play_script_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > play_script_async_apply(
+			const KyotoTycoonService::play_script& message) {
+		return instance.call_apply("play_script", message);
+	}
+
+	msgpack::rpc::future::type<std::map<std::string,std::string> > play_script_async(
+			const std::string& name, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::play_script _Message;
+		_Message.name = name;
+		_Message.inmap = inmap;
+		return play_script_async_apply(_Message);
+	}
+	void tune_replication_apply(
+			const KyotoTycoonService::tune_replication& message) {
+		instance.call_apply("tune_replication", message).get<void>();
+	}
+
+	void tune_replication(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::tune_replication _Message;
+		_Message.inmap = inmap;
+		return tune_replication_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> tune_replication_async_apply(
+			const KyotoTycoonService::tune_replication& message) {
+		return instance.call_apply("tune_replication", message);
+	}
+
+	msgpack::rpc::future::type<void> tune_replication_async(
+			const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::tune_replication _Message;
+		_Message.inmap = inmap;
+		return tune_replication_async_apply(_Message);
+	}
+	void cur_jump_apply(
+			const KyotoTycoonService::cur_jump& message) {
+		instance.call_apply("cur_jump", message).get<void>();
+	}
+
+	void cur_jump(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_jump _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_jump_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_jump_async_apply(
+			const KyotoTycoonService::cur_jump& message) {
+		return instance.call_apply("cur_jump", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_jump_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_jump _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_jump_async_apply(_Message);
+	}
+	void cur_jump_back_apply(
+			const KyotoTycoonService::cur_jump_back& message) {
+		instance.call_apply("cur_jump_back", message).get<void>();
+	}
+
+	void cur_jump_back(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_jump_back _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_jump_back_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_jump_back_async_apply(
+			const KyotoTycoonService::cur_jump_back& message) {
+		return instance.call_apply("cur_jump_back", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_jump_back_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_jump_back _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_jump_back_async_apply(_Message);
+	}
+	void cur_step_apply(
+			const KyotoTycoonService::cur_step& message) {
+		instance.call_apply("cur_step", message).get<void>();
+	}
+
+	void cur_step(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_step _Message;
+		_Message.CUR = CUR;
+		return cur_step_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_step_async_apply(
+			const KyotoTycoonService::cur_step& message) {
+		return instance.call_apply("cur_step", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_step_async(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_step _Message;
+		_Message.CUR = CUR;
+		return cur_step_async_apply(_Message);
+	}
+	void cur_step_back_apply(
+			const KyotoTycoonService::cur_step_back& message) {
+		instance.call_apply("cur_step_back", message).get<void>();
+	}
+
+	void cur_step_back(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_step_back _Message;
+		_Message.CUR = CUR;
+		return cur_step_back_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_step_back_async_apply(
+			const KyotoTycoonService::cur_step_back& message) {
+		return instance.call_apply("cur_step_back", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_step_back_async(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_step_back _Message;
+		_Message.CUR = CUR;
+		return cur_step_back_async_apply(_Message);
+	}
+	void cur_set_value_apply(
+			const KyotoTycoonService::cur_set_value& message) {
+		instance.call_apply("cur_set_value", message).get<void>();
+	}
+
+	void cur_set_value(
+			const std::string& CUR, const std::string& value, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_set_value _Message;
+		_Message.CUR = CUR;
+		_Message.value = value;
+		_Message.inmap = inmap;
+		return cur_set_value_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_set_value_async_apply(
+			const KyotoTycoonService::cur_set_value& message) {
+		return instance.call_apply("cur_set_value", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_set_value_async(
+			const std::string& CUR, const std::string& value, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_set_value _Message;
+		_Message.CUR = CUR;
+		_Message.value = value;
+		_Message.inmap = inmap;
+		return cur_set_value_async_apply(_Message);
+	}
+	void cur_remove_apply(
+			const KyotoTycoonService::cur_remove& message) {
+		instance.call_apply("cur_remove", message).get<void>();
+	}
+
+	void cur_remove(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_remove _Message;
+		_Message.CUR = CUR;
+		return cur_remove_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_remove_async_apply(
+			const KyotoTycoonService::cur_remove& message) {
+		return instance.call_apply("cur_remove", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_remove_async(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_remove _Message;
+		_Message.CUR = CUR;
+		return cur_remove_async_apply(_Message);
+	}
+	void cur_get_key_apply(
+			const KyotoTycoonService::cur_get_key& message) {
+		instance.call_apply("cur_get_key", message).get<void>();
+	}
+
+	void cur_get_key(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get_key _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_key_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_key_async_apply(
+			const KyotoTycoonService::cur_get_key& message) {
+		return instance.call_apply("cur_get_key", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_key_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get_key _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_key_async_apply(_Message);
+	}
+	void cur_get_value_apply(
+			const KyotoTycoonService::cur_get_value& message) {
+		instance.call_apply("cur_get_value", message).get<void>();
+	}
+
+	void cur_get_value(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get_value _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_value_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_value_async_apply(
+			const KyotoTycoonService::cur_get_value& message) {
+		return instance.call_apply("cur_get_value", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_value_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get_value _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_value_async_apply(_Message);
+	}
+	void cur_get_apply(
+			const KyotoTycoonService::cur_get& message) {
+		instance.call_apply("cur_get", message).get<void>();
+	}
+
+	void cur_get(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_async_apply(
+			const KyotoTycoonService::cur_get& message) {
+		return instance.call_apply("cur_get", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_get_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_get _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_get_async_apply(_Message);
+	}
+	void cur_seize_apply(
+			const KyotoTycoonService::cur_seize& message) {
+		instance.call_apply("cur_seize", message).get<void>();
+	}
+
+	void cur_seize(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_seize _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_seize_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_seize_async_apply(
+			const KyotoTycoonService::cur_seize& message) {
+		return instance.call_apply("cur_seize", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_seize_async(
+			const std::string& CUR, const std::map<std::string,std::string> & inmap) {
+		KyotoTycoonService::cur_seize _Message;
+		_Message.CUR = CUR;
+		_Message.inmap = inmap;
+		return cur_seize_async_apply(_Message);
+	}
+	void cur_delete_apply(
+			const KyotoTycoonService::cur_delete& message) {
+		instance.call_apply("cur_delete", message).get<void>();
+	}
+
+	void cur_delete(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_delete _Message;
+		_Message.CUR = CUR;
+		return cur_delete_apply(_Message);
+	}
+
+	msgpack::rpc::future::type<void> cur_delete_async_apply(
+			const KyotoTycoonService::cur_delete& message) {
+		return instance.call_apply("cur_delete", message);
+	}
+
+	msgpack::rpc::future::type<void> cur_delete_async(
+			const std::string& CUR) {
+		KyotoTycoonService::cur_delete _Message;
+		_Message.CUR = CUR;
+		return cur_delete_async_apply(_Message);
 	}
 };
 

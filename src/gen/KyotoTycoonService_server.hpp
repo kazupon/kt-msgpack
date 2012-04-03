@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_server_50622f49_HPP__
-#define MPRPC_KyotoTycoonService_server_50622f49_HPP__
+#ifndef MPRPC_KyotoTycoonService_server_fcb1a691_HPP__
+#define MPRPC_KyotoTycoonService_server_fcb1a691_HPP__
 
 #include "KyotoTycoonService.hpp"
 
@@ -50,6 +50,19 @@ public:
 	virtual void get_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::get_bulk&) = 0;
 	virtual void vacuum(msgpack::rpc::request::type<void>, KyotoTycoonService::vacuum&) = 0;
 	virtual void synchronize(msgpack::rpc::request::type<void>, KyotoTycoonService::synchronize&) = 0;
+	virtual void play_script(msgpack::rpc::request::type<std::map<std::string,std::string> >, KyotoTycoonService::play_script&) = 0;
+	virtual void tune_replication(msgpack::rpc::request::type<void>, KyotoTycoonService::tune_replication&) = 0;
+	virtual void cur_jump(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_jump&) = 0;
+	virtual void cur_jump_back(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_jump_back&) = 0;
+	virtual void cur_step(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_step&) = 0;
+	virtual void cur_step_back(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_step_back&) = 0;
+	virtual void cur_set_value(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_set_value&) = 0;
+	virtual void cur_remove(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_remove&) = 0;
+	virtual void cur_get_key(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_get_key&) = 0;
+	virtual void cur_get_value(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_get_value&) = 0;
+	virtual void cur_get(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_get&) = 0;
+	virtual void cur_seize(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_seize&) = 0;
+	virtual void cur_delete(msgpack::rpc::request::type<void>, KyotoTycoonService::cur_delete&) = 0;
 };
 
 
@@ -79,6 +92,19 @@ void KyotoTycoonService::server::remove_bulk(msgpack::rpc::request::type<std::ma
 void KyotoTycoonService::server::get_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::get_bulk& params)
 void KyotoTycoonService::server::vacuum(msgpack::rpc::request::type<void> req, KyotoTycoonService::vacuum& params)
 void KyotoTycoonService::server::synchronize(msgpack::rpc::request::type<void> req, KyotoTycoonService::synchronize& params)
+void KyotoTycoonService::server::play_script(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::play_script& params)
+void KyotoTycoonService::server::tune_replication(msgpack::rpc::request::type<void> req, KyotoTycoonService::tune_replication& params)
+void KyotoTycoonService::server::cur_jump(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump& params)
+void KyotoTycoonService::server::cur_jump_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump_back& params)
+void KyotoTycoonService::server::cur_step(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step& params)
+void KyotoTycoonService::server::cur_step_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step_back& params)
+void KyotoTycoonService::server::cur_set_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_set_value& params)
+void KyotoTycoonService::server::cur_remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_remove& params)
+void KyotoTycoonService::server::cur_get_key(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_key& params)
+void KyotoTycoonService::server::cur_get_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_value& params)
+void KyotoTycoonService::server::cur_get(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get& params)
+void KyotoTycoonService::server::cur_seize(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_seize& params)
+void KyotoTycoonService::server::cur_delete(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_delete& params)
 */
 
 
