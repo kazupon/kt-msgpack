@@ -60,7 +60,19 @@ Configure and install in the usual way:
         map<string, string> get_bulk(1:optional map<string, string> inmap)
         void vacuum (1:optional map<string, string> inmap)
         void synchronize (1:optional map<string, string> inmap)
-        map<string, string> play_script(1:string name, 2:optional map<string, string> inmap);
+        map<string, string> play_script(1:string name, 2:optional map<string, string> inmap)
+        void tune_replication(1:optional map<string, string> inmap)
+        void cur_jump(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_jump_back(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_step(1:string CUR)
+        void cur_step_back(1:string CUR)
+        void cur_set_value(1:string CUR, 2:string value, 3:optional map<string, string> inmap)
+        void cur_remove(1:string CUR)
+        void cur_get_key(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_get_value(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_get(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_seize(1:string CUR, 2:optional map<string, string> inmap)
+        void cur_delete(1:string CUR)
     }
 
 
@@ -611,6 +623,54 @@ returns the map data that contains the following keys.
 the following error codes returned in the response.
 
 - 41: arbitrary logical error.
+
+
+### tune\_replication (not implemented)
+    void tune_replication(1:optional map<string, string> inmap)
+
+
+### cur\_jump (not implemented)
+    void cur_jump(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_jump\_back (not implemented)
+    void cur_jump_back(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_step (not implemented)
+    void cur_step(1:string CUR)
+
+
+### cur\_step\_back (not implemented)
+    void cur_step_back(1:string CUR)
+
+
+### cur\_set\_value (not implemented)
+    void cur_set_value(1:string CUR, 2:string value, 3:optional map<string, string> inmap)
+
+
+### cur\_remove (not implemented)
+    void cur_remove(1:string CUR)
+
+
+### cur\_get\_key (not implemented)
+    void cur_get_key(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_get\_value (not implemented)
+    void cur_get_value(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_get (not implemented)
+    void cur_get(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_seize (not implemented)
+    void cur_seize(1:string CUR, 2:optional map<string, string> inmap)
+
+
+### cur\_delete (not implemented)
+    void cur_delete(1:string CUR)
 
 
 
