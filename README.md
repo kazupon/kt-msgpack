@@ -103,7 +103,7 @@ if necessary, specify the arbitrary keys in `inmap` parameter.
 corresponding parameters to the input data.
 
 
-### report
+### report (not implemented)
     map<string, string> report()
 
 Get the report of the database server information.

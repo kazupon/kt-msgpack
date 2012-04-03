@@ -187,7 +187,8 @@ private:
 
   void report(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::report& params) {
 		log(m_logger, Logger::INFO, LOG_PREFIX " report");
-
+    req.error(ERR_NOT_IMPLEMENTED);
+    /*
     double tout = 0;
     kt::RemoteDB db;
     if (!db.open(m_cfg.master_host.c_str(), m_cfg.master_port, tout)) {
@@ -216,6 +217,7 @@ private:
     } else {
       req.result(status);
     }
+    */
   }
 
   void status(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::status& params) {
