@@ -745,6 +745,27 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     # specific no parameter.
     self._client.call('synchronize')
 
+  def test_play_script(self):
+    num = 100
+    base = 'play_script'
+    inmap = self.create_inmap(base, num)
+    # nromal
+    ret1 = self._client.call('play_script', 'echo', inmap)
+    for i in range(0, num):
+      self.assertEqual(ret1['_%s%d' % (base, i)], u'%d' % i)
+
+    # not exist call name.
+    try:
+      self._client.call('play_script', 'xxxx')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 41)
+    
+    # specific no parameter.
+    try:
+      self._client.call('play_script')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 2)
+
 
 if __name__ == '__main__':
   unittest.main()
