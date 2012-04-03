@@ -746,6 +746,12 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
     self._client.call('synchronize')
 
   def test_play_script(self):
+    try:
+      self._client.call('play_script')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+    """
     num = 100
     base = 'play_script'
     inmap = self.create_inmap(base, num)
@@ -765,6 +771,79 @@ class TestKyotoTycoonMsgPack(unittest.TestCase):
       self._client.call('play_script')
     except error.RPCError as e:
       self.assertEqual(e.args[0], 2)
+    """
+
+  def test_tune_replication(self):
+    try:
+      self._client.call('tune_replication')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_jump(self):
+    try:
+      self._client.call('cur_jump')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_jump_back(self):
+    try:
+      self._client.call('cur_jump_back')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_step(self):
+    try:
+      self._client.call('cur_step')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_step_back(self):
+    try:
+      self._client.call('cur_step_back')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_set_value(self):
+    try:
+      self._client.call('cur_set_value')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_remove(self):
+    try:
+      self._client.call('cur_remove')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_get_key(self):
+    try:
+      self._client.call('cur_get_key')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_get_value(self):
+    try:
+      self._client.call('cur_get_value')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_get(self):
+    try:
+      self._client.call('cur_get')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+  
+  def test_cur_seize(self):
+    try:
+      self._client.call('cur_seize')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
+
+  def test_cur_delete(self):
+    try:
+      self._client.call('cur_delete')
+    except error.RPCError as e:
+      self.assertEqual(e.args[0], 42)
 
 
 if __name__ == '__main__':
