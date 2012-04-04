@@ -690,6 +690,17 @@ the following error codes returned in the response.
 
 
 
+## Testing
+
+1. Invoke the KyotoTycoon with the following.
+
+    $ ktserver -cmd ./test -plsv /opt/local/libexec/libktmsgpack.dylib -plex 'port=18801#cmd=./test' casket1.kct casket2.kct casket3.kch
+
+2. Run the tests.
+
+    $ python test/test-kt-msgpack.py
+
+
 ## License
 
     Copyright (C) 2010 FURUHASHI Sadayuki
