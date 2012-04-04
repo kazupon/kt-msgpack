@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_client_f8a090eb_HPP__
-#define MPRPC_KyotoTycoonService_client_f8a090eb_HPP__
+#ifndef MPRPC_KyotoTycoonService_client_243a0d42_HPP__
+#define MPRPC_KyotoTycoonService_client_243a0d42_HPP__
 
 #include "KyotoTycoonService.hpp"
 

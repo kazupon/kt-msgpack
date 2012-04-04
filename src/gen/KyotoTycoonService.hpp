@@ -1,5 +1,5 @@
-#ifndef MPRPC_KyotoTycoonService_4bab49f4_HPP__
-#define MPRPC_KyotoTycoonService_4bab49f4_HPP__
+#ifndef MPRPC_KyotoTycoonService_e49b1418_HPP__
+#define MPRPC_KyotoTycoonService_e49b1418_HPP__
 
 #include "types.hpp"
 
