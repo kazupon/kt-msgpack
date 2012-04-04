@@ -47,6 +47,17 @@ private:
     buf[len] = '\0';
     logger->log(kind, buf);
   }
+  void log(Logger::Kind kind, const char* format, ...) {
+    if (!(kind & m_kind)) {
+      return;
+    }
+    std::string msg;
+    va_list ap;
+    va_start(ap, format);
+    kc::vstrprintf(&msg, format, ap);
+    va_end(ap);
+    m_logger->log(kind, msg.c_str());
+  }
 
 public:
   void configure(kt::TimedDB* dbary, size_t dbnum,
@@ -57,14 +68,16 @@ public:
     m_dbnum = dbnum;
 
     m_logger = logger;
-    log(m_logger, Logger::SYSTEM, LOG_PREFIX " dbnum: %d", m_dbnum);
-    log(m_logger, Logger::SYSTEM, LOG_PREFIX " configured expr:%s", expr);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " host=%s", m_cfg.host.c_str());
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " port=%d", m_cfg.port);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " thread=%d", m_cfg.thread);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " mhost=%s", m_cfg.master_host.c_str());
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " mport=%d", m_cfg.master_port);
-    log(m_logger, Logger::DEBUG, LOG_PREFIX " cmd=%s", m_cfg.cmd.c_str());
+    m_kind = (Logger::Kind)logkinds;
+
+    log(Logger::SYSTEM, LOG_PREFIX " dbnum: %d", m_dbnum);
+    log(Logger::SYSTEM, LOG_PREFIX " configured expr:%s", expr);
+    log(Logger::DEBUG, LOG_PREFIX " host=%s", m_cfg.host.c_str());
+    log(Logger::DEBUG, LOG_PREFIX " port=%d", m_cfg.port);
+    log(Logger::DEBUG, LOG_PREFIX " thread=%d", m_cfg.thread);
+    log(Logger::DEBUG, LOG_PREFIX " mhost=%s", m_cfg.master_host.c_str());
+    log(Logger::DEBUG, LOG_PREFIX " mport=%d", m_cfg.master_port);
+    log(Logger::DEBUG, LOG_PREFIX " cmd=%s", m_cfg.cmd.c_str());
 
     for (int32_t i = 0; i < m_dbnum; i++) {
       std::string path = m_dbary[i].path();
@@ -84,7 +97,7 @@ public:
       instance.get_loop()->start(m_cfg.thread);
       return true;
     } catch (std::exception& e) {
-      log(m_logger, Logger::ERROR, LOG_PREFIX "listen failed: %s", e.what());
+      log(Logger::ERROR, LOG_PREFIX "listen failed: %s", e.what());
       return false;
     }
   }
@@ -161,6 +174,7 @@ private:
 
   Config m_cfg;
   Logger* m_logger;
+  Logger::Kind m_kind;
   kt::TimedDB* m_dbary;
   size_t m_dbnum;
   std::map<std::string, int32_t> m_dbmap;
@@ -169,13 +183,13 @@ private:
 
 private:
   void ping(msgpack::rpc::request::type<void> req, KyotoTycoonService::ping& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " ping");
+		log(Logger::INFO, LOG_PREFIX " ping");
 
     req.result();
   }
 
   void echo(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::echo& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " echo");
+		log(Logger::INFO, LOG_PREFIX " echo");
 
     map_t outmap;
     for (map_t::const_iterator it(params.inmap.begin()), it_end(params.inmap.end()); it != it_end; ++it) {
@@ -186,14 +200,14 @@ private:
   }
 
   void report(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::report& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " report");
+		log(Logger::INFO, LOG_PREFIX " report");
     req.error(ERR_NOT_IMPLEMENTED);
     /*
     double tout = 0;
     kt::RemoteDB db;
     if (!db.open(m_cfg.master_host.c_str(), m_cfg.master_port, tout)) {
       kt::RemoteDB::Error e = db.error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX " report db open error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX " report db open error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
@@ -202,13 +216,13 @@ private:
     map_t status;
     if (!db.report(&status)) {
       kt::RemoteDB::Error e = db.error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX " report db report error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX " report db report error: %d: %s: %s", e.code(), e.name(), e.message());
       err = true;
     }
 
     if (!db.close()) {
       kt::RemoteDB::Error e = db.error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX " report db close error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX " report db close error: %d: %s: %s", e.code(), e.name(), e.message());
       err = true;
     }
 
@@ -221,7 +235,7 @@ private:
   }
 
   void status(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::status& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " status");
+		log(Logger::INFO, LOG_PREFIX " status");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -239,7 +253,7 @@ private:
     map_t status;
     if (!db->status(&status)) {
       const kc::BasicDB::Error& e = db->error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX " status procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX " status procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
@@ -248,7 +262,7 @@ private:
   }
 
   void add(msgpack::rpc::request::type<void> req, KyotoTycoonService::add& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " add");
+		log(Logger::INFO, LOG_PREFIX " add");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -272,14 +286,14 @@ private:
       if (e == kc::BasicDB::Error::DUPREC) {
         req.error(ERR_EXSISTING_RECORD);
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " add procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
       }
     }
   }
 
   void set(msgpack::rpc::request::type<void> req, KyotoTycoonService::set& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " set");
+		log(Logger::INFO, LOG_PREFIX " set");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -299,7 +313,7 @@ private:
     if (!db->set(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " set procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " set procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
       }
     }
@@ -308,7 +322,7 @@ private:
   }
 
   void get(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::get& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " get");
+		log(Logger::INFO, LOG_PREFIX " get");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -331,11 +345,11 @@ private:
       if (e == kc::BasicDB::Error::NOREC) {
         req.error(ERR_NO_RECORD);
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " get procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " get procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
       }
 		} else {
-      //log(m_logger, Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
+      //log(Logger::DEBUG, LOG_PREFIX " get: value = %s, xt = %lld", vbuf, xt);
       map_t outmap;
       insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
@@ -347,7 +361,7 @@ private:
   }
 
   void remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::remove& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " remove");
+		log(Logger::INFO, LOG_PREFIX " remove");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -367,7 +381,7 @@ private:
       if (e == kc::BasicDB::Error::NOREC) {
         req.error(ERR_NO_RECORD);
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " remove procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " remove procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -377,7 +391,7 @@ private:
   }
 
   void append(msgpack::rpc::request::type<void> req, KyotoTycoonService::append& params) {
-		log(m_logger, Logger::INFO, LOG_PREFIX " append");
+		log(Logger::INFO, LOG_PREFIX " append");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -397,7 +411,7 @@ private:
     if (!db->append(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " append procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " append procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -407,7 +421,7 @@ private:
   }
 
   void seize(msgpack::rpc::request::type<std::map<std::string, std::string> > req, KyotoTycoonService::seize& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " seize");
+    log(Logger::INFO, LOG_PREFIX " seize");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -430,11 +444,11 @@ private:
       if (e == kc::BasicDB::Error::NOREC) {
         req.error(ERR_NO_RECORD);
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " seize procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " seize procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
       }
 		} else {
-      //log(m_logger, Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
+      //log(Logger::DEBUG, LOG_PREFIX " seize: value = %s, xt = %lld", vbuf, xt);
       map_t outmap;
       insert_to_map(outmap, "value", "%s", vbuf);
       if (xt < kt::TimedDB::XTMAX) {
@@ -446,7 +460,7 @@ private:
   }
 
   void clear(msgpack::rpc::request::type<void> req, KyotoTycoonService::clear& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " clear");
+    log(Logger::INFO, LOG_PREFIX " clear");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -463,7 +477,7 @@ private:
 
     if (!db->clear()) {
       const kc::BasicDB::Error& e = db->error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX " clear procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX " clear procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
@@ -472,7 +486,7 @@ private:
   }
   
   void replace(msgpack::rpc::request::type<void> req, KyotoTycoonService::replace& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " replace");
+    log(Logger::INFO, LOG_PREFIX " replace");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -492,7 +506,7 @@ private:
     if (!db->replace(params.key.c_str(), params.key.size(), params.value.c_str(), params.value.size(), xt)) {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " replace procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " replace procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -502,7 +516,7 @@ private:
   }
 
   void cas(msgpack::rpc::request::type<void> req, KyotoTycoonService::cas& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cas");
+    log(Logger::INFO, LOG_PREFIX " cas");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -529,7 +543,7 @@ private:
         req.error(ERR_OLD_VALUE_ASSUMPTION);
         return;
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " cas procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " cas procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -539,7 +553,7 @@ private:
   }
 
   void increment(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " increment");
+    log(Logger::INFO, LOG_PREFIX " increment");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -569,13 +583,13 @@ private:
     } else {
       orig = 0;
     }
-    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: orig = %lld", (long long)orig);
+    //log(Logger::DEBUG, LOG_PREFIX " increment: orig = %lld", (long long)orig);
 
     const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
 
     num = db->increment(params.key.c_str(), params.key.size(), num, orig, xt);
-    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment: num = %lld", (long long)num);
+    //log(Logger::DEBUG, LOG_PREFIX " increment: num = %lld", (long long)num);
     if (num != kc::INT64MIN) {
       map_t outmap;
       insert_to_map(outmap, "num", "%lld", (long long)num);
@@ -586,7 +600,7 @@ private:
         req.error(ERR_EXSISTING_RECORD_NOT_COMPATIBLE);
         return;
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " increment procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " increment procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -594,7 +608,7 @@ private:
   }
 
   void increment_double(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::increment_double& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " increment_double");
+    log(Logger::INFO, LOG_PREFIX " increment_double");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -624,13 +638,13 @@ private:
     } else {
       orig = 0;
     }
-    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: orig = %f", orig);
+    //log(Logger::DEBUG, LOG_PREFIX " increment_double: orig = %f", orig);
 
     const char* s_xt = kt::strmapget(params.inmap, "xt");
     int64_t xt = s_xt ? kc::atoi(s_xt) : kc::INT64MAX;
 
     num = db->increment_double(params.key.c_str(), params.key.size(), num, orig, xt);
-    //log(m_logger, Logger::DEBUG, LOG_PREFIX " increment_double: num = %f", num);
+    //log(Logger::DEBUG, LOG_PREFIX " increment_double: num = %f", num);
     if (!kc::chknan(num)) {
       map_t outmap;
       insert_to_map(outmap, "num", "%f", num);
@@ -641,7 +655,7 @@ private:
         req.error(ERR_EXSISTING_RECORD_NOT_COMPATIBLE);
         return;
       } else {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " increment_double procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " increment_double procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -649,7 +663,7 @@ private:
   }
 
   void match_prefix(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_prefix& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " match_prefix");
+    log(Logger::INFO, LOG_PREFIX " match_prefix");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -684,7 +698,7 @@ private:
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " match_prefix procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " match_prefix procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -692,7 +706,7 @@ private:
   }
 
   void match_regex(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::match_regex& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " match_regex");
+    log(Logger::INFO, LOG_PREFIX " match_regex");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -727,7 +741,7 @@ private:
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " match_regex procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " match_regex procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -735,7 +749,7 @@ private:
   }
 
   void set_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::set_bulk& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " set_bulk");
+    log(Logger::INFO, LOG_PREFIX " set_bulk");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -778,7 +792,7 @@ private:
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " set_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " set_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -786,7 +800,7 @@ private:
   }
 
   void remove_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::remove_bulk& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " remove_bulk");
+    log(Logger::INFO, LOG_PREFIX " remove_bulk");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -826,7 +840,7 @@ private:
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " remove_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " remove_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -834,7 +848,7 @@ private:
   }
 
   void get_bulk(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::get_bulk& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " get_bulk");
+    log(Logger::INFO, LOG_PREFIX " get_bulk");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -883,7 +897,7 @@ private:
     } else {
       const kc::BasicDB::Error& e = db->error();
       if (e) {
-        log(m_logger, Logger::ERROR, LOG_PREFIX " get_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+        log(Logger::ERROR, LOG_PREFIX " get_bulk procedure error: %d: %s: %s", e.code(), e.name(), e.message());
         req.error(ERR_UNEXPECTED_ERROR);
         return;
       }
@@ -891,7 +905,7 @@ private:
   }
 
   void vacuum(msgpack::rpc::request::type<void> req, KyotoTycoonService::vacuum& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " vacuum");
+    log(Logger::INFO, LOG_PREFIX " vacuum");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -911,7 +925,7 @@ private:
                     
     if (!db->vacuum(step)) {
       const kc::BasicDB::Error& e = db->error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       req.error(ERR_UNEXPECTED_ERROR);
       return;
     }
@@ -920,7 +934,7 @@ private:
   }
 
   void synchronize(msgpack::rpc::request::type<void> req, KyotoTycoonService::synchronize& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " synchronize");
+    log(Logger::INFO, LOG_PREFIX " synchronize");
 
     kt::TimedDB* db = NULL;
     size_t db_name_size;
@@ -984,7 +998,7 @@ private:
 
     if (!db->synchronize(hard, &visitor)) {
       const kc::BasicDB::Error& e = db->error();
-      log(m_logger, Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
+      log(Logger::ERROR, LOG_PREFIX "  vacuum procedure error: %d: %s: %s", e.code(), e.name(), e.message());
       if (e == kc::BasicDB::Error::LOGIC) {
         req.error(ERR_FAILED_POST_PROCESSING_COMMAND);
       } else {
@@ -997,67 +1011,67 @@ private:
   }
 
   void play_script(msgpack::rpc::request::type<std::map<std::string,std::string> > req, KyotoTycoonService::play_script& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " play_script");
+    log(Logger::INFO, LOG_PREFIX " play_script");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void tune_replication(msgpack::rpc::request::type<void> req, KyotoTycoonService::tune_replication& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " tune_replication");
+    log(Logger::INFO, LOG_PREFIX " tune_replication");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_jump(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_jump");
+    log(Logger::INFO, LOG_PREFIX " cur_jump");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_jump_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_jump_back& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_jump_back");
+    log(Logger::INFO, LOG_PREFIX " cur_jump_back");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_step(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_step");
+    log(Logger::INFO, LOG_PREFIX " cur_step");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_step_back(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_step_back& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_step_back");
+    log(Logger::INFO, LOG_PREFIX " cur_step_back");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_set_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_set_value& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_set_value");
+    log(Logger::INFO, LOG_PREFIX " cur_set_value");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_remove(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_remove& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_remove");
+    log(Logger::INFO, LOG_PREFIX " cur_remove");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_get_key(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_key& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get_key");
+    log(Logger::INFO, LOG_PREFIX " cur_get_key");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_get_value(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get_value& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get_value");
+    log(Logger::INFO, LOG_PREFIX " cur_get_value");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_get(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_get& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_get");
+    log(Logger::INFO, LOG_PREFIX " cur_get");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_seize(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_seize& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_seize");
+    log(Logger::INFO, LOG_PREFIX " cur_seize");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
   void cur_delete(msgpack::rpc::request::type<void> req, KyotoTycoonService::cur_delete& params) {
-    log(m_logger, Logger::INFO, LOG_PREFIX " cur_delete");
+    log(Logger::INFO, LOG_PREFIX " cur_delete");
     req.error(ERR_NOT_IMPLEMENTED);
   }
 
