@@ -214,7 +214,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
     try {
       client.clear(inmap);
     } catch (msgpack::rpc::remote_error& e) {
-      oprintf("clear error: %d", e.error());
+      oprintf("clear error: %d\n", e.error());
       err = true;
     }
   }
@@ -251,7 +251,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
           try {
             client.set(std::string(kbuf, ksiz), std::string(kbuf, ksiz), inmap);
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("set error: %d", e.error());
+            oprintf("set error: %d\n", e.error());
             err_ = true;
           }
           if (id_ < 1 && rnum_ > 250 && i % (rnum_ / 250) == 0) {
@@ -315,7 +315,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
             client.add(std::string(kbuf, ksiz), std::string(kbuf, ksiz), inmap);
           } catch (msgpack::rpc::remote_error& e) {
             if (e.error() != 33) {
-              oprintf("add error: %d", e.error());
+              oprintf("add error: %d\n", e.error());
               err_ = true;
             }
           }
@@ -379,7 +379,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
           try {
             client.append(std::string(kbuf, ksiz), std::string(kbuf, ksiz), inmap);
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("append error: %d", e.error());
+            oprintf("append error: %d\n", e.error());
             err_ = true;
           }
           if (id_ < 1 && rnum_ > 250 && i % (rnum_ / 250) == 0) {
@@ -439,7 +439,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
           try {
             outmap = client.get(std::string(kbuf, ksiz), inmap);
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("get error: %d", e.error());
+            oprintf("get error: %d\n", e.error());
             err_ = true;
           }
           if (id_ < 1 && rnum_ > 250 && i % (rnum_ / 250) == 0) {
@@ -498,7 +498,7 @@ static int32_t procorder(int64_t rnum, int32_t thnum, bool rnd, int32_t mode,
           try {
             client.remove(std::string(kbuf, ksiz), inmap);
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("remove error: %d", e.error());
+            oprintf("remove error: %d\n", e.error());
             err_ = true;
           }
           if (id_ < 1 && rnum_ > 250 && i % (rnum_ / 250) == 0) {
@@ -547,7 +547,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
     try {
       client.clear(inmap);
     } catch (msgpack::rpc::remote_error& e) {
-      oprintf("clear error: %d", e.error());
+      oprintf("clear error: %d\n", e.error());
       err = true;
     }
   }
@@ -597,7 +597,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
               }
               inmap.clear();
             } catch (msgpack::rpc::remote_error& e) {
-              oprintf("set_bulk error: %d", e.error());
+              oprintf("set_bulk error: %d\n", e.error());
               err_ = true;
             }
           }
@@ -617,13 +617,13 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
             outmap = client.set_bulk(inmap);
             const char* num_ptr  = kt::strmapget(outmap, "num");
             int64_t num = num_ptr ? kc::atoi(num_ptr) : kc::INT64MAX;
-            if (num != (int64_t)inmap.size()) {
-              oprintf("set record number unmatch !!");
+            if (num != (int64_t)inmap.size() - 1) {
+              oprintf("set record number unmatch !!\n");
               err_ = true;
             }
             inmap.clear();
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("set_bulk error: %d", e.error());
+            oprintf("set_bulk error: %d\n", e.error());
             err_ = true;
           }
         }
@@ -694,7 +694,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
               }
               inmap.clear();
             } catch (msgpack::rpc::remote_error& e) {
-              oprintf("get_bulk error: %d", e.error());
+              oprintf("get_bulk error: %d\n", e.error());
               err_ = true;
             }
           }
@@ -711,12 +711,12 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
             const char* num_ptr  = kt::strmapget(outmap, "num");
             int64_t num = num_ptr ? kc::atoi(num_ptr) : kc::INT64MAX;
             if (num < 0) {
-              oprintf("get record number unmatch !!");
+              oprintf("get record number unmatch !!\n");
               err_ = true;
             }
             inmap.clear();
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("get_bulk error: %d", e.error());
+            oprintf("get_bulk error: %d\n", e.error());
             err_ = true;
           }
         }
@@ -787,7 +787,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
               }
               inmap.clear();
             } catch (msgpack::rpc::remote_error& e) {
-              oprintf("remove_bulk error: %d", e.error());
+              oprintf("remove_bulk error: %d\n", e.error());
               err_ = true;
             }
           }
@@ -804,12 +804,12 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
             const char* num_ptr  = kt::strmapget(outmap, "num");
             int64_t num = num_ptr ? kc::atoi(num_ptr) : kc::INT64MAX;
             if (num < 0) {
-              oprintf("remove record number unmatch !!");
+              oprintf("remove record number unmatch !!\n");
               err_ = true;
             }
             inmap.clear();
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("remove_bulk error: %d", e.error());
+            oprintf("remove_bulk error: %d\n", e.error());
             err_ = true;
           }
         }
@@ -889,7 +889,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
                   err_ = true;
                 }
               } catch (msgpack::rpc::remote_error& e) {
-                oprintf("get_bulk error: %d", e.error());
+                oprintf("get_bulk error: %d\n", e.error());
                 err_ = true;
               }
             } else if (cmd < 90) {
@@ -898,7 +898,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
                 const char* num_ptr  = kt::strmapget(outmap, "num");
                 int64_t num = num_ptr ? kc::atoi(num_ptr) : kc::INT64MAX;
                 if (num < 0) {
-                  oprintf("set record number unmatch !!");
+                  oprintf("set record number unmatch !!\n");
                   err_ = true;
                 }
               } catch (msgpack::rpc::remote_error& e) {
@@ -915,7 +915,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
                   err_ = true;
                 }
               } catch (msgpack::rpc::remote_error& e) {
-                oprintf("remove_bulk error: %d", e.error());
+                oprintf("remove_bulk error: %d\n", e.error());
                 err_ = true;
               }
             } else {
@@ -923,7 +923,7 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
                 outmap = client.play_script("echo", inmap);
               } catch (msgpack::rpc::remote_error& e) {
                 if (e.error() != 42) {
-                  oprintf("play_script error: %d", e.error());
+                  oprintf("play_script error: %d\n", e.error());
                   err_ = true;
                 }
               }
@@ -947,13 +947,13 @@ static int32_t procbulk(int64_t rnum, int32_t thnum, bool rnd, int32_t mode, int
             outmap = client.set_bulk(inmap);
             const char* num_ptr  = kt::strmapget(outmap, "num");
             int64_t num = num_ptr ? kc::atoi(num_ptr) : kc::INT64MAX;
-            if (num != (int64_t)inmap.size()) {
-              oprintf("set record number unmatch !!");
+            if (num != (int64_t)inmap.size() - 1) {
+              oprintf("set record number unmatch !!\n");
               err_ = true;
             }
             inmap.clear();
           } catch (msgpack::rpc::remote_error& e) {
-            oprintf("set_bulk error: %d", e.error());
+            oprintf("set_bulk error: %d\n", e.error());
             err_ = true;
           }
         }
